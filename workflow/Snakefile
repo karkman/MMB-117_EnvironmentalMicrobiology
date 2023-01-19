@@ -47,7 +47,7 @@ rule cutadapt:
 	conda:
 		"envs/cutadapt.yml"
 	shell:
-		"cutadapt -a file:primers/FW_primers.fasta -A file:primers/RV_primers.fasta -m 1 \
+		"cutadapt -a CCTACGGGNGGCWGCAG -A GACTACHVGGGTATCTAATCC -m 50 \
                                 {input.fw} {input.rv} -o {output.fw} -p {output.rv} > {output.log}"	
 
 rule fastqc_trim:
