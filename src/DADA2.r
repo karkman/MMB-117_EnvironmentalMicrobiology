@@ -1,3 +1,6 @@
+.libPaths(c("~/projappl/project_rpackages_r421", .libPaths()))
+libpath <- .libPaths()[1]
+
 library(dada2)
 library(phyloseq)
 library(microViz)
