@@ -6,11 +6,11 @@ library(phyloseq)
 library(microViz)
 
 # Paired-end Illumina data
- path <- "Work/Projects/naava/trimmed_data"
+path <- "trimmed_data"
 #list.files(path)
 
-fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq", full.names = TRUE))
+fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
 plotQualityProfile(fnFs[1:12])
@@ -22,7 +22,7 @@ filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(250, 200),
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300, 225),
               maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
 
@@ -51,46 +51,44 @@ colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
 
-#taxa50 <- assignTaxonomy(seqtab.nochim, "/Users/karkman/Work/Bioinfo/Databases/training_set.138_SSURef_NR99.fa.gz", minBoot=50, multithread=TRUE)
-#taxa50 <- addSpecies(taxa50, "/Users/karkman/Work/Bioinfo/Databases/species_assignment.138_SSURef_NR99.fa.gz", tryRC = TRUE)
-
-taxa80 <- assignTaxonomy(seqtab.nochim, "/Users/karkman/Work/Bioinfo/Databases/SILVA138/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
+taxa <- assignTaxonomy(seqtab.nochim, "/Users/karkman/Work/Bioinfo/Databases/SILVA138/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
                         minBoot=80, multithread=TRUE)
 
 # for pretty printing of the taxonomy
-taxa.print <- taxa80
+taxa.print <- taxa
 rownames(taxa.print) <- NULL
 head(taxa.print)
 
-naava <- phyloseq(otu_table(t(seqtab.nochim), taxa_are_rows=TRUE),
+physeq <- phyloseq(otu_table(t(seqtab.nochim), taxa_are_rows=TRUE),
                  tax_table(taxa80))
 
-dna <- Biostrings::DNAStringSet(taxa_names(naava))
-names(dna) <- taxa_names(naava)
-naava <- merge_phyloseq(naava, dna)
+dna <- Biostrings::DNAStringSet(taxa_names(physeq))
+names(dna) <- taxa_names(physeq)
+physeq <- merge_phyloseq(physeq, dna)
 
-taxa_names(naava) <- paste0("ASV", seq(ntaxa(naava)))
+taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
 ## remove unwanted (both missing from data)
 # mitochondria
-naava <- prune_taxa(!(taxa_names(naava) %in% taxa_names(subset_taxa(naava, Family=="Mitochondria"))), naava)
+physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Family=="Mitochondria"))), physeq)
 # chloroplasts
-naava <- prune_taxa(!(taxa_names(naava) %in% taxa_names(subset_taxa(naava, Order=="Chloroplast"))), naava)
+physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Order=="Chloroplast"))), physeq)
 
-naava_meta <- read.table("Work/Projects/naava/SraRunTable.txt", sep=",", header=TRUE, row.names=1)
-naava_meta <- separate(naava_meta, Isolation_source, sep="_", into="SampleType", remove=FALSE)
-sample_data(naava) <- sample_data(naava_meta)
+physeq_meta <- read_table"doc/meta.csv", sep=",", header=TRUE, row.names=1)
+sample_data(physeq) <- sample_data(physeq_meta)
 
-saveRDS(naava, "Work/Projects/naava/naava.rds")
-naava <- readRDS("Work/Projects/naava/naava.rds")
+saveRDS(physeq, "outputs/physeq.rds")
+physeq <- readRDS("outputs/physeq.rds")
 
-naava %>%
+physeq %>% ord_explore
+
+physeq %>%
   tax_fix(unknowns = c("Incertae Sedis")) %>%
   comp_barplot(tax_level = "Genus", sample_order="default", n_taxa=19, facet_by = "SampleType") +
   coord_flip() +
   theme(axis.ticks.y=element_blank(),  axis.text.y=element_blank())
 
-naava %>%
+physeq %>%
   tax_fix(unknowns = c("Incertae Sedis")) %>%
   comp_barplot(tax_level = "Genus", sample_order="default", n_taxa=19, facet_by = "SampleType") +
   coord_flip() +
