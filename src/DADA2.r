@@ -50,7 +50,7 @@ colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
 
-taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/silva_species_assignment_v138.1.fa.gz",
+taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
                         minBoot=80, multithread=TRUE)
 
 # for pretty printing of the taxonomy
