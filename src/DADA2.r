@@ -73,7 +73,7 @@ physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Fa
 # chloroplasts
 physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Order=="Chloroplast"))), physeq)
 
-physeq_meta <- read_table"doc/meta.csv", sep=",", header=TRUE, row.names=1)
+physeq_meta <- read_table("doc/meta.csv", sep=",", header=TRUE, row.names=1)
 sample_data(physeq) <- sample_data(physeq_meta)
 
 saveRDS(physeq, "outputs/physeq.rds")
