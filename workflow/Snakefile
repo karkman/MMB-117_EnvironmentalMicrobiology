@@ -47,8 +47,17 @@ rule cutadapt:
 	conda:
 		"envs/cutadapt.yml"
 	shell:
-		"cutadapt -a CCTACGGGNGGCWGCAG -A GACTACHVGGGTATCTAATCC -m 50 \
-                                {input.fw} {input.rv} -o {output.fw} -p {output.rv} > {output.log}"	
+		"""
+		cutadapt \
+			-g CCTACGGGNGGCWGCAG \
+			-G GACTACHVGGGTATCTAATCC \
+			-m 50 \
+			-O 10 \
+            {input.fw} {input.rv} \
+			-o {output.fw} \
+			-p {output.rv} \
+			> {output.log}
+		"""
 
 rule fastqc_trim:
 	input:

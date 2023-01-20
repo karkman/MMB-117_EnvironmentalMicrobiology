@@ -7,7 +7,6 @@ library(microViz)
 
 # Paired-end Illumina data
 path <- "trimmed_data"
-#list.files(path)
 
 fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
@@ -51,7 +50,7 @@ colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
 
-taxa <- assignTaxonomy(seqtab.nochim, "/Users/karkman/Work/Bioinfo/Databases/SILVA138/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
+taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/silva_species_assignment_v138.1.fa.gz",
                         minBoot=80, multithread=TRUE)
 
 # for pretty printing of the taxonomy
