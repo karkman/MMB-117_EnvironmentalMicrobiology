@@ -1,3 +1,7 @@
 data/*
 .snakemake/*
 trimmed_data/*
+lectures/*
+materials/*
+.DS_Store
+.ipynb_checkpoints
