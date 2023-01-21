@@ -23,7 +23,7 @@ names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300, 225),
-              maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
+              maxN=0, maxEE=c(2,3), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
 
 errF <- learnErrors(filtFs, multithread=TRUE)
