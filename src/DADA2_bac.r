@@ -6,14 +6,14 @@ library(phyloseq)
 library(microViz)
 
 # Paired-end Illumina data
-path <- "trimmed_data"
+path <- "trimmed_data/bac_data"
 
 fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
-plotQualityProfile(fnFs[1:12])
-plotQualityProfile(fnRs[1:12])
+plotQualityProfile(fnFs[1:6])
+plotQualityProfile(fnRs[1:6])
 
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_R1_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
@@ -76,8 +76,8 @@ physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Or
 physeq_meta <- read.table("doc/meta.csv", sep=",", header=TRUE, row.names=1)
 sample_data(physeq) <- sample_data(physeq_meta)
 
-saveRDS(physeq, "outputs/physeq.rds")
-physeq <- readRDS("outputs/physeq.rds")
+saveRDS(physeq, "outputs/physeq_bac.rds")
+physeq <- readRDS("outputs/physeq_bac.rds")
 
 physeq %>% ord_explore
 

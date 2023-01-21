@@ -6,7 +6,7 @@ library(phyloseq)
 library(microViz)
 
 # Paired-end Illumina data
-path <- "trimmed_data"
+path <- "trimmed_data/fun_data"
 
 fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
@@ -21,8 +21,8 @@ filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300, 225),
-              maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE,
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+              maxN=0, maxEE=2, truncQ=2, rm.phix=TRUE, minLen=75,
               compress=TRUE, multithread=TRUE)
 
 errF <- learnErrors(filtFs, multithread=TRUE)
@@ -50,8 +50,8 @@ colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
 
-taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
-                        minBoot=80, multithread=TRUE)
+taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/sh_general_release_dynamic_29.11.2022.fasta",
+                        minBoot=80, multithread=TRUE, tryRC = TRUE)
 
 # for pretty printing of the taxonomy
 taxa.print <- taxa
@@ -67,17 +67,11 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-## remove unwanted (both missing from data)
-# mitochondria
-physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Family=="Mitochondria"))), physeq)
-# chloroplasts
-physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Order=="Chloroplast"))), physeq)
-
 physeq_meta <- read.table("doc/meta.csv", sep=",", header=TRUE, row.names=1)
 sample_data(physeq) <- sample_data(physeq_meta)
 
-saveRDS(physeq, "outputs/physeq.rds")
-physeq <- readRDS("outputs/physeq.rds")
+saveRDS(physeq, "outputs/physeq_fun.rds")
+physeq <- readRDS("outputs/physeq_fun.rds")
 
 physeq %>% ord_explore
 
