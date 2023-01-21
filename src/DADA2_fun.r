@@ -67,7 +67,7 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-physeq_meta <- read.table("doc/meta.csv", sep=",", header=TRUE, row.names=1)
+physeq_meta <- read.table("doc/fun_meta.csv", sep=",", header=TRUE, row.names=1)
 sample_data(physeq) <- sample_data(physeq_meta)
 
 saveRDS(physeq, "outputs/physeq_fun.rds")
