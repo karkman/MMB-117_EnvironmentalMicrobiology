@@ -4,6 +4,7 @@ libpath <- .libPaths()[1]
 library(dada2)
 library(phyloseq)
 library(microViz)
+library(tidyverse)
 
 # Paired-end Illumina data
 path <- "trimmed_data/bac_data"
@@ -73,13 +74,13 @@ physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Fa
 # chloroplasts
 physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Order=="Chloroplast"))), physeq)
 
-physeq_meta <- read.table("doc/bac_meta.csv", sep=",", header=TRUE, row.names=1)
+physeq_meta <- read_delim("doc/bac_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
 sample_data(physeq) <- sample_data(physeq_meta)
 
 saveRDS(physeq, "outputs/physeq_bac.rds")
 physeq <- readRDS("outputs/physeq_bac.rds")
 
-physeq %>% ord_explore
+physeq %>% tax_fix() %>% ord_explore
 
 physeq %>%
   tax_fix(unknowns = c("Incertae Sedis")) %>%

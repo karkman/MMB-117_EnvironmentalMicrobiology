@@ -4,6 +4,7 @@ libpath <- .libPaths()[1]
 library(dada2)
 library(phyloseq)
 library(microViz)
+library(tidyverse)
 
 # Paired-end Illumina data
 path <- "trimmed_data/fun_data"
@@ -67,7 +68,7 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-physeq_meta <- read.table("doc/fun_meta.csv", sep=",", header=TRUE, row.names=1)
+physeq_meta <- read_delim("doc/fun_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
 sample_data(physeq) <- sample_data(physeq_meta)
 
 saveRDS(physeq, "outputs/physeq_fun.rds")
