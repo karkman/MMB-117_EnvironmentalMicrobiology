@@ -5,10 +5,12 @@ lorem ipsum
 First we need to load some libraries.  
 
 ```{r}
-library(tidyverse)
+.libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
+libpath <- .libPaths()[1]
+
 library(phyloseq)
-library(vegan)
 library(microViz)
+library(tidyverse)
 ```
 
 ```{r}
