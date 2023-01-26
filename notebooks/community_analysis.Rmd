@@ -1,0 +1,19 @@
+# Bacterial and fungal community analysis
+
+lorem ipsum
+
+First we need to load some libraries.  
+
+```{r}
+.libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
+libpath <- .libPaths()[1]
+
+library(phyloseq)
+library(microViz)
+library(tidyverse)
+```
+
+```{r}
+bac_raw <- readRDS()
+fun_raw <- readRDS()
+```

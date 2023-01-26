@@ -5,3 +5,5 @@ lectures/*
 materials/*
 .DS_Store
 .ipynb_checkpoints
+*.pdf
+*.RDS
