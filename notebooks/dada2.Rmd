@@ -14,32 +14,57 @@ library(tidyverse)
 
 ## 16S rRNA data
 
+First assing the path to the adta that has been trimmed from PCR primers.
 ```{r}
 path <- "trimmed_data/bac_data"
+```
 
+Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.  
+And get the samples names from the names of the read files (from R1 read files to be precise.)
+```{r}
 fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+```
 
+To be able to decide the trimming parameters, we'll plot the quality profiles from first six read files. Separately for R1 and R2 reads.  
+
+__Why? Any ideas?__
+
+```{r}
 plotQualityProfile(fnFs[1:6])
 plotQualityProfile(fnRs[1:6])
+````
 
+Before stating to trim the reads, we define the output files for the trimmed reads.
+```{r}
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_R1_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
 
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
+````
 
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300, 225),
-              maxN=0, maxEE=c(2,3), truncQ=2, rm.phix=TRUE,
+Then we can quality trimn the reads, but first we need to decide some the trimming parameters based on the quality plots.  
+Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors per read. 
+```{r}
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX, XXX),
+              maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
 
+``` 
+
+Then we can run the error learning function on the quality trimmed reads and plot the error profiles. 
+```{r}
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
+```
 
+
+```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE, pool=TRUE)
 dadaRs <- dada(filtRs, err=errF, multithread=TRUE, pool=TRUE)
 
