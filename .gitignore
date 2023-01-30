@@ -7,3 +7,6 @@ materials/*
 .ipynb_checkpoints
 *.pdf
 *.RDS
+workflow
+doc/*.r
+src/*.r
