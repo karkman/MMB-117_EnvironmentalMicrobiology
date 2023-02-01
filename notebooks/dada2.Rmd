@@ -1,6 +1,7 @@
 # DADA2 pipeline
 
-Libraries
+We need some R packages (that have been pre-installed for tthis course) to run the analyses.  
+Just load them by running the code block below.  
 
 ```{r}
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
@@ -14,7 +15,7 @@ library(tidyverse)
 
 ## 16S rRNA data
 
-First assing the path to the adta that has been trimmed from PCR primers.
+First assing the path to the data that has been trimmed from PCR primers.
 ```{r}
 path <- "trimmed_data/bac_data"
 ```
@@ -28,8 +29,6 @@ sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```
 
 To be able to decide the trimming parameters, we'll plot the quality profiles from first six read files. Separately for R1 and R2 reads.  
-
-__Why? Any ideas?__
 
 ```{r}
 plotQualityProfile(fnFs[1:6])
@@ -63,56 +62,88 @@ plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
 ```
 
+And when we are happy with that, the actual `dada` command to make the ASVs.  
+After it is done, we merge the forward and reverse reads and convert it to a sequence table.
 
 ```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE, pool=TRUE)
 dadaRs <- dada(filtRs, err=errF, multithread=TRUE, pool=TRUE)
 
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
-
 seqtab <- makeSequenceTable(mergers)
+```
+
+Now we have haave the first look of our ASVs. First the dimensions of our sequence table (number of samples and ASVs). 
+And also the lenght distribuiton of our ASVs tot check that it matches what we are expecting. 
+
+```{r}
 dim(seqtab)
 table(nchar(getSequences(seqtab)))
+```
 
+If everything looks fine at this stage, we don't need to re-run the trimming step and can proceed to the chimera removal step. 
+
+```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim)
+````
 
+After the chimera removal, we are done with making the ASVs and we can run the last quality checks on our data. 
+First we check how much data was actually removed at the chimera removal step.  
+And then produce a table (`track`) showing how much data was removed at each step. 
+
+```{r}
 sum(seqtab.nochim)/sum(seqtab)
 
 track <- cbind(out, rowSums(seqtab), rowSums(seqtab.nochim))
 colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
+```
 
+Again, if everything looks fine, we can assign taxonomic classification to our ASVs against the Silva 16S rRNA database (the database has been pre-downloaded to the course database folder).
+```{r}
 taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/silva_nr99_v138.1_wSpecies_train_set.fa.gz",
                         minBoot=80, multithread=TRUE)
 
 taxa.print <- taxa
 rownames(taxa.print) <- NULL
 head(taxa.print)
+```
 
+The last step is to make a phylsoeq object from our ASV table and taxonomic annotations. And add the metadata there as well.  
+At this stage the names of the ASVs are their sequences, so we can store the sequences as a separate data in our phyloseq object and give the ASVs nicer names. 
+```{r}
 physeq <- phyloseq(otu_table(t(seqtab.nochim), taxa_are_rows=TRUE),
                  tax_table(taxa))
+
+physeq_meta <- read_delim("doc/bac_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
+sample_data(physeq) <- sample_data(physeq_meta)
 
 dna <- Biostrings::DNAStringSet(taxa_names(physeq))
 names(dna) <- taxa_names(physeq)
 physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
+```
 
-## remove unwanted (both missing from data)
+We should also remove unwanted sequences from our data (if there is any).
+
+```{r}
 # mitochondria
 physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Family=="Mitochondria"))), physeq)
 # chloroplasts
 physeq <- prune_taxa(!(taxa_names(physeq) %in% taxa_names(subset_taxa(physeq, Order=="Chloroplast"))), physeq)
+```
 
-physeq_meta <- read_delim("doc/bac_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
-sample_data(physeq) <- sample_data(physeq_meta)
-
+And the last part would be to save our data in a format that we can easily read back to R. 
+```{r}
 saveRDS(physeq, "outputs/physeq_bac.rds")
 ```
 
 ## ITS data
+
+And then the same steps for ITS data. 
 
 ```{r}
 path <- "trimmed_data/fun_data"
