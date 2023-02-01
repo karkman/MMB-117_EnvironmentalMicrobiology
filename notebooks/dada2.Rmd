@@ -1,6 +1,6 @@
 # DADA2 pipeline
 
-We need some R packages (that have been pre-installed for tthis course) to run the analyses.  
+We need some R packages (that have been pre-installed for this course) to run the analyses.  
 Just load them by running the code block below.  
 
 ```{r}
@@ -13,6 +13,13 @@ library(microViz)
 library(tidyverse)
 ```
 
+
+And we need to set the working directory to the right folder (change the command below to point to your own folder).  
+
+```{r}
+setwd("/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/")
+```
+
 ## 16S rRNA data
 
 First assing the path to the data that has been trimmed from PCR primers.
@@ -23,8 +30,8 @@ path <- "trimmed_data/bac_data"
 Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.  
 And get the samples names from the names of the read files (from R1 read files to be precise.)
 ```{r}
-fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
+fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```
 
