@@ -13,7 +13,6 @@ library(microViz)
 library(tidyverse)
 ```
 
-
 And we need to set the working directory to the right folder (change the command below to point to your own folder).  
 
 ```{r}
@@ -22,9 +21,9 @@ setwd("/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiolog
 
 ## 16S rRNA data
 
-First assing the path to the data that has been trimmed from PCR primers.
+First assing the path to the data that has been trimmed from PCR primers. We need to assign the full path, so again change your own username to the
 ```{r}
-path <- "trimmed_data/bac_data"
+path <- "/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/bac_data"
 ```
 
 Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.  
@@ -40,7 +39,7 @@ To be able to decide the trimming parameters, we'll plot the quality profiles fr
 ```{r}
 plotQualityProfile(fnFs[1:6])
 plotQualityProfile(fnRs[1:6])
-````
+```
 
 Before stating to trim the reads, we define the output files for the trimmed reads.
 ```{r}
@@ -49,7 +48,7 @@ filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
 
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
-````
+```
 
 Then we can quality trimn the reads, but first we need to decide some the trimming parameters based on the quality plots.  
 Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors per read. 
@@ -93,7 +92,7 @@ If everything looks fine at this stage, we don't need to re-run the trimming ste
 ```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim)
-````
+```
 
 After the chimera removal, we are done with making the ASVs and we can run the last quality checks on our data. 
 First we check how much data was actually removed at the chimera removal step.  
