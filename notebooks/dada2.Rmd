@@ -8,6 +8,7 @@ And then run the code block below.
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
+require("knitr")
 opts_knit$set(root.dir = "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/")
 
 library(dada2)
@@ -48,7 +49,7 @@ names(filtRs) <- sample.names
 ```
 
 Then we can quality trimn the reads, but first we need to decide some the trimming parameters based on the quality plots.  
-Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors per read. 
+Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors (`maxEE`) per read. 
 ```{r}
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX, XXX),
               maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
