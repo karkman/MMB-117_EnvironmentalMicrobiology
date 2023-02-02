@@ -53,7 +53,6 @@ Before running the trimming command, set the trimming length (`truncLen`) and th
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX, XXX),
               maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
-
 ``` 
 
 Then we can run the error learning function on the quality trimmed reads and plot the error profiles. 
@@ -165,7 +164,7 @@ names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
-              maxN=0, maxEE=c(2,3), truncQ=2, rm.phix=TRUE, minLen=75,
+              maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE, minLen=75,
               compress=TRUE, multithread=TRUE)
 
 errF <- learnErrors(filtFs, multithread=TRUE)
