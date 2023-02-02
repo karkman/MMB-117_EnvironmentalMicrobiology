@@ -1,22 +1,19 @@
 # DADA2 pipeline
 
 We need some R packages (that have been pre-installed for this course) to run the analyses.  
-Just load them by running the code block below.  
+And we need to set the working drectory to our course folder. So change the "USERNAME" to your own username below.
+And then run the code block below.  
 
-```{r}
+```{r setup}
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
+
+opts_knit$set(root.dir = "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/")
 
 library(dada2)
 library(phyloseq)
 library(microViz)
 library(tidyverse)
-```
-
-And we need to set the working directory to the right folder (change the command below to point to your own folder).  
-
-```{r}
-setwd("/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/")
 ```
 
 ## 16S rRNA data
