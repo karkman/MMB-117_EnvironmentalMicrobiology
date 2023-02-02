@@ -48,7 +48,7 @@ names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 ```
 
-Then we can quality trimn the reads, but first we need to decide some the trimming parameters based on the quality plots.  
+Then we can quality trim the reads, but first we need to decide some the trimming parameters based on the quality plots.  
 Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors (`maxEE`) per read. 
 ```{r}
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX, XXX),
@@ -84,7 +84,7 @@ dim(seqtab)
 table(nchar(getSequences(seqtab)))
 ```
 
-If everything looks fine at this stage, we don't need to re-run the trimming step and can proceed to the chimera removal step. 
+If everything looks fine at this stage, we do not need to re-run the trimming step and can proceed to the chimera removal step. 
 
 ```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
@@ -130,7 +130,7 @@ physeq <- merge_phyloseq(physeq, dna)
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 ```
 
-We should also remove unwanted sequences from our data (if there is any).
+We should also remove unwanted sequences from our data (if there are any).
 
 ```{r}
 # mitochondria
@@ -149,7 +149,7 @@ saveRDS(physeq, "outputs/physeq_bac.rds")
 And then the same steps for ITS data. 
 
 ```{r}
-path <- "trimmed_data/fun_data"
+path <- "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/fun_data"
 
 fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
