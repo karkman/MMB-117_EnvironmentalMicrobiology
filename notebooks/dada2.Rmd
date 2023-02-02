@@ -16,14 +16,14 @@ library(tidyverse)
 And we need to set the working directory to the right folder (change the command below to point to your own folder).  
 
 ```{r}
-setwd("/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/")
+setwd("/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/")
 ```
 
 ## 16S rRNA data
 
 First assing the path to the data that has been trimmed from PCR primers. We need to assign the full path, so again change your own username to the
 ```{r}
-path <- "/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/bac_data"
+path <- "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/bac_data"
 ```
 
 Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.  
