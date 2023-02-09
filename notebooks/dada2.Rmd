@@ -1,14 +1,15 @@
 # DADA2 pipeline
 
 We need some R packages (that have been pre-installed for this course) to run the analyses.  
-And we need to set the working drectory to our course folder. So change the "USERNAME" to your own username below.
+And we need to set the working directory to our course folder. So change the "USERNAME" to your own username below.
 And then run the code block below.  
 
 ```{r setup}
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
-opts_knit$set(root.dir = "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/")
+require("knitr")
+opts_knit$set(root.dir = "/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/")
 
 library(dada2)
 library(phyloseq)
@@ -20,7 +21,7 @@ library(tidyverse)
 
 First assing the path to the data that has been trimmed from PCR primers. We need to assign the full path, so again change your own username to the
 ```{r}
-path <- "/scratch/project_2007145/USERNAME/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/bac_data"
+path <- "/scratch/project_2007145/antkark/MMB-117/MMB-117_EnvironmentalMicrobiology/trimmed_data/bac_data"
 ```
 
 Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.  
@@ -48,12 +49,12 @@ names(filtRs) <- sample.names
 ```
 
 Then we can quality trimn the reads, but first we need to decide some the trimming parameters based on the quality plots.  
-Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors per read. 
+Before running the trimming command, set the trimming length (`truncLen`) and the maximun expected errors (`maxEE`) per read. 
 ```{r}
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX, XXX),
-              maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+              maxN=0, maxEE=c(2,3), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
-
+out
 ``` 
 
 Then we can run the error learning function on the quality trimmed reads and plot the error profiles. 
@@ -61,8 +62,8 @@ Then we can run the error learning function on the quality trimmed reads and plo
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 
-plotErrors(errF, nominalQ=TRUE)
-plotErrors(errR, nominalQ=TRUE)
+#plotErrors(errF, nominalQ=TRUE)
+#plotErrors(errR, nominalQ=TRUE)
 ```
 
 And when we are happy with that, the actual `dada` command to make the ASVs.  
@@ -70,7 +71,7 @@ After it is done, we merge the forward and reverse reads and convert it to a seq
 
 ```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE, pool=TRUE)
-dadaRs <- dada(filtRs, err=errF, multithread=TRUE, pool=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE, pool=TRUE)
 
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 seqtab <- makeSequenceTable(mergers)
@@ -120,8 +121,8 @@ At this stage the names of the ASVs are their sequences, so we can store the seq
 physeq <- phyloseq(otu_table(t(seqtab.nochim), taxa_are_rows=TRUE),
                  tax_table(taxa))
 
-physeq_meta <- read_delim("doc/bac_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
-sample_data(physeq) <- sample_data(physeq_meta)
+physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim=";", locale=locale(decimal_mark = ",")) %>% column_to_rownames("Run")
+sample_data(physeq) <- physeq_meta %>% sample_data()
 
 dna <- Biostrings::DNAStringSet(taxa_names(physeq))
 names(dna) <- taxa_names(physeq)
@@ -144,6 +145,7 @@ And the last part would be to save our data in a format that we can easily read 
 saveRDS(physeq, "outputs/physeq_bac.rds")
 ```
 
+
 ## ITS data
 
 And then the same steps for ITS data. 
@@ -151,13 +153,15 @@ And then the same steps for ITS data.
 ```{r}
 path <- "trimmed_data/fun_data"
 
-fnFs <- sort(list.files(path, pattern="_1_trimmed.fastq.gz", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern="_2_trimmed.fastq.gz", full.names = TRUE))
+fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
 plotQualityProfile(fnFs[1:12])
 plotQualityProfile(fnRs[1:12])
+```
 
+```{r}
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_R1_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R2_filt.fastq.gz"))
 
@@ -167,32 +171,45 @@ names(filtRs) <- sample.names
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
               maxN=0, maxEE=c(2,3), truncQ=2, rm.phix=TRUE, minLen=75,
               compress=TRUE, multithread=TRUE)
+out
+```
 
+```{r}
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
+```
 
+```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE, pool=TRUE)
-dadaRs <- dada(filtRs, err=errF, multithread=TRUE, pool=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE, pool=TRUE)
 
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
-
 seqtab <- makeSequenceTable(mergers)
+```
+
+```{r}
 dim(seqtab)
 table(nchar(getSequences(seqtab)))
+```
 
+```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim)
+```
 
+```{r}
 sum(seqtab.nochim)/sum(seqtab)
 
 track <- cbind(out, rowSums(seqtab), rowSums(seqtab.nochim))
 colnames(track) <- c("input", "filtered", "denoised", "nonchim")
 rownames(track) <- sample.names
 track
+```
 
+```{r}
 taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/sh_general_release_dynamic_29.11.2022.fasta",
                         minBoot=80, multithread=TRUE, tryRC = TRUE)
 
@@ -200,6 +217,9 @@ taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2007145/databases/sh_gen
 taxa.print <- taxa
 rownames(taxa.print) <- NULL
 head(taxa.print)
+```
+
+```{r}
 
 physeq <- phyloseq(otu_table(t(seqtab.nochim), taxa_are_rows=TRUE),
                  tax_table(taxa))
@@ -210,8 +230,9 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-physeq_meta <- read_delim("doc/fun_meta.csv", delim=",", col_types="ccc") %>% column_to_rownames("Run")
-sample_data(physeq) <- sample_data(physeq_meta)
+physeq_meta <- read_delim("doc/metadata_fungi.csv", delim=";", locale=locale(decimal_mark = ",")) %>% column_to_rownames("Run")
+sample_data(physeq) <- physeq_meta %>% sample_data()
 
+physeq
 saveRDS(physeq, "outputs/physeq_fun.rds")
 ```
