@@ -11,9 +11,247 @@ libpath <- .libPaths()[1]
 library(phyloseq)
 library(microViz)
 library(tidyverse)
+library(vegan)
 ```
 
+Read in the data. 
+
 ```{r}
-bac_raw <- readRDS()
-fun_raw <- readRDS()
+bac_raw <- readRDS("outputs/physeq_bac.rds")
+fun_raw <- readRDS("outputs/physeq_fun.rds")
+
+bac_raw <- bac_raw %>% subset_taxa(Kingdom!="NA")
+fun_raw <- fun_raw %>% subset_taxa(Kingdom!="NA")
+```
+
+First we'll plot some metadata parameters.  
+As they are the same for both fungi and bacteria, we can take the metadata table from the bacteria phyloseq object.
+
+```{r}
+metadata <- sample_data(bac_raw) %>%
+                data.frame() %>%
+                rownames_to_column("sample_name") %>%
+                tibble() 
+metadata
+```
+
+We have the negative controls in there, so we need to get rif off them. And also get rid of the factor 
+
+```{r}
+sample_metadata <- metadata %>% 
+                filter(Site!="NA") %>% droplevels()
+sample_metadata
+```
+
+The quick and dirty way of looking at your data (we can leave out the `Group` variable).
+
+```{r}
+plot(sample_metadata[2:8])
+```
+
+
+Then we could look at the differences in pH between park, forest and agricultual soils. 
+
+```{r}
+sample_metadata %>% 
+        ggplot(aes(x=Site, y=pH, fill=Site)) + geom_boxplot()
+```
+
+What else could be interesting to plot? Change the `x` and `y`.  
+
+```{r}
+sample_metadata %>% 
+        ggplot(aes(x=XX, y=YY, fill=Site)) + geom_boxplot()
+```
+
+Then it's time to look at the microbial community data.  
+We'll use the bacterial data as an example and then you can explore the fundal data on your own. 
+
+Let's start with some preliminary data exploration
+
+First the total count per sample (sample size, library size...)
+
+```{r}
+bac_raw %>% sample_sums()
+```
+
+We can  also plot that 
+
+```{r}
+bac_raw %>% 
+    sample_sums() %>% 
+    barplot(las=3)
+```
+
+Then using the `ord_explore` function.
+
+```{r}
+bac_raw %>% 
+    tax_fix() %>%
+    ord_explore
+```
+
+
+We probably need to remove some samples from our data set. At least the negative controls. 
+```{r}
+bac_raw <- bac_raw %>% 
+                subset_samples(Site!="NA")
+
+bac_raw <- bac_raw %>% 
+                prune_samples(sample_names(.)!="A026-D-fore-bac", .)
+```
+
+Also remember to remove the sample from the metadata.
+
+```{r}
+sample_metadata <- sample_metadata %>% subset(sample_name != "A026-D-fore-bac")
+```
+
+We can make two different versions of our data.  
+One with relative abundances (proportions) and one with centered log-ratio transformation.
+
+```{r}
+bac_ra <- bac_raw %>% transform_sample_counts(function(x) x/sum(x))
+bac_clr <- bac_raw %>% tax_transform(trans="clr")
+```
+
+Barplot of taxa relative abundances
+```{r}
+bac_ra %>% 
+    tax_fix() %>%
+    comp_barplot("Genus", n_taxa = 19, merge_other = TRUE, label = "Group") + 
+        facet_grid(.~Site, scales="free")
+```
+
+Now do on a different taxonomic level.
+
+```{r}
+bac_ra %>% 
+    tax_fix() %>%
+    comp_barplot()
+```
+
+Alpha diversity measures.  
+For that we need the species table from our phyloseq object.  
+We will use the diversity functions in vegan, which expects taxa to be columns by default. So we can either transpose the matrix or use the `MARGIN` option in the functions.
+
+```{r}
+asv_table_raw <- otu_table(bac_raw) %>% t()
+asv_table_ra <- otu_table(bac_ra) %>% t()
+asv_table_clr <- otu_table(bac_clr) %>% t()
+```
+
+First we can count the number of observed "species" (ASVs). 
+
+```{r}
+asv_table_raw %>% 
+    specnumber(MARGIN=1)
+```
+
+And also plot that.
+
+```{r}
+asv_table_raw %>% 
+    specnumber(MARGIN=1) %>% 
+    data.frame(index=.) %>% 
+    rownames_to_column("sample_name") %>%
+    left_join(., metadata) %>% 
+    ggplot(aes(x=Site, y=index, fill=Site)) + 
+        geom_boxplot() +
+        labs(y="Observed ASVs", x="")
+```
+
+Is the number of observed species dependent on the library size? Maybe we should check. 
+
+```{r}
+obs_asv <- asv_table_raw %>% 
+    specnumber(MARGIN=1) %>% 
+    data.frame(obs=.) %>% 
+    rownames_to_column("sample_name")
+
+total_count <- asv_table_raw %>% 
+    sample_sums() %>% 
+    data.frame(sum=.) %>% 
+    rownames_to_column("sample_name")
+
+left_join(obs_asv, total_count) %>% ggplot(aes(x=sum, y=obs)) + geom_point()
+```
+
+To get comparable values, we nee dto rarefy the data. 
+```{r}
+bac_rf <- rarefy_even_depth(bac_raw)
+asv_table_rf <- otu_table(bac_rf)
+
+asv_table_rf %>% 
+    specnumber(MARGIN=1) %>% 
+    data.frame(index=.) %>% 
+    rownames_to_column("sample_name") %>%
+    left_join(., metadata) %>% 
+    ggplot(aes(x=Site, y=index, fill=Site)) + 
+        geom_boxplot() +
+        labs(y="Observed ASVs (rarefied data)", x="")
+```
+
+Then we can calculate the shannon index from the raw data.
+
+```{r}
+asv_table_raw %>% 
+    diversity(index="shannon", MARGIN=1)
+```
+
+And again also plot that.
+
+```{r}
+asv_table_raw %>% 
+    diversity(index="shannon", MARGIN=1) %>% 
+    data.frame(index=.) %>% 
+    rownames_to_column("sample_name") %>%
+    left_join(., metadata) %>% 
+    ggplot(aes(x=Site, y=index, fill=Site)) + 
+        geom_boxplot() +
+        labs(y="Shannon index", x="")
+```
+
+Now do the same using the proportions and with simpson's index (`index="simpson"`).
+
+```{r}
+SOME_CODE_HERE
+```
+
+Beta-diversity and ordinations.   
+
+First we need distance matrices calculated from the normalized/transformed data.
+We'll use the Bray-Curtis dissimilarity index for the relative abundances and euclidean distances for the clr transformed data.
+
+```{r}
+dist_ra <- asv_table_ra %>% vegdist(method="bray") 
+dist_clr <- asv_table_clr %>% vegdist(method="euclidean") 
+```
+
+Then we can plot a PCoA plot from the Bray-Curtis dissimilarities. 
+```{r}
+dist_ra %>% 
+    cmdscale() %>%  
+    data.frame() %>% 
+    rownames_to_column("sample_name") %>%
+    left_join(., sample_metadata) %>% 
+    ggplot(aes(x=X1, y=X2, color=Site)) + geom_point() 
+```
+
+And the same for the clr/euclidean data.
+
+```{r}
+dist_clr %>%
+    cmdscale() %>%  
+    data.frame() %>% 
+    rownames_to_column("sample_name") %>%
+    left_join(., sample_metadata) %>% 
+    ggplot(aes(x=X1, y=X2, color=Site)) + geom_point() 
+```
+
+Hypothesis testing. 
+
+```{r}
+SOME_CODE_HERE
+
 ```
