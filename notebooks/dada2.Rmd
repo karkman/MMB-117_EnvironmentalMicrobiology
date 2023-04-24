@@ -63,8 +63,8 @@ Then we can run the error learning function on the quality trimmed reads and plo
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 
-#plotErrors(errF, nominalQ=TRUE)
-#plotErrors(errR, nominalQ=TRUE)
+plotErrors(errF, nominalQ=TRUE)
+plotErrors(errR, nominalQ=TRUE)
 ```
 
 And when we are happy with that, the actual `dada` command to make the ASVs.  
