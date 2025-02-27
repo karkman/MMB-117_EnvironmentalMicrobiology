@@ -142,91 +142,54 @@ ASV_tableRA.mat_o<-ASV_tableRA.mat[match(MMB117metadata$Sample,row.names(ASV_tab
 # Now I can also get Shannons diversity index and put that into metadata
 
 MMB117metadata$ASV_divSha<-diversity(ASV_tableRA.mat_o)
+```
 
 
+## Data exploration
 
+According to:
+Zuur, A.F., Ieno, E.N. and Elphick, C.S. (2010), 
+A protocol for data exploration to avoid common statistical problems. 
+[Methods in Ecology and Evolution, 1: 3-14](https://doi.org/10.1111/j.2041-210X.2009.00001.x)
 
-###################################################################################
+I want to start from ***INDEPENDENCE***, since it is the most important assumption:
 
-#                                 Data exploration                                #
+We had only one sampling point. Thus we don't really have "traditional" independence problem which would arise from repeated measurements.  
+If we would have taken samples before and after some treatment from the same sites, we would have to take this into account in our statistical analyses
+(use mixed models, etc.)
 
-###################################################################################
+### Outliers in X & Y-
 
-# According to
-# Zuur, A.F., Ieno, E.N. and Elphick, C.S. (2010), 
-# A protocol for data exploration to avoid common statistical problems. 
-# Methods in Ecology and Evolution, 1: 3-14. https://doi.org/10.1111/j.2041-210X.2009.00001.x
+X = metadata and things that are usually on x-axis
 
-#############################################################################################
+Y = the numerical data we use, in this case we have  microbiome data that are either counts (non-normalized),  
+relative abundance (TSS-normalized), or clr-transformed normally distributed numbers that can be used in statistical analyses
 
+Metadata first.
 
-# I want to start from ***INDEPENDENCE***, since it is the most important assumption:
-
-# We had only one sampling point.
-# Thus we don't really have "traditional" independence problem which would arise from repeated measurements.
-# If we would have taken samples before and after some treatment from the same 
-# sites, we would have to take this into account in our statistical analyses
-# (use mixed models, etc.)
-
-############################################################################################
-
-# --- Outliers in X & Y--- #
-
-# X = metadata and things that are usually on x-axis
-
-# Y = the numerical data we use, in this case we have  microbiome data that are either counts (non-normalized), 
-# relative abundance (TSS-normalized), or clr-transformed normally distributed numbers that can be used 
-# in statistical analyses
-
-# metadata first.
+```{r}
 str(MMB117metadata)
-
-#'data.frame':	25 obs. of  20 variables:
-# $ Sample                  : Factor w/ 26 levels "","FI_01","FI_02",..: 14 15 16 17 18 19 21 22 23 24 ...
-#$ Site                    : Factor w/ 6 levels "","-","Field",..: 5 5 5 5 5 5 6 6 6 6 ...
-#$ SnowDepth               : Factor w/ 6 levels "","0 cm","10 cm",..: 3 3 1 1 2 1 4 4 1 3 ...
-#$ WetWeight               : num  10 10 11.2 17.4 10 ...
-#$ DryWeight               : num  6.51 6.47 6.84 13.51 5.57 ...
-#$ X80C_DryWeight          : num  NA NA 6.79 13.43 5.44 ...
-#$ DNAWeight               : num  306 237 501 285 340 ...
-#$ Moisture                : num  58 58 65.1 32 84.7 ...
-#$ pH_W                    : num  6.61 5.76 6.18 6.37 6.19 6.37 5.8 6.37 6.6 6.4 ...
-#$ pH_Ca                   : num  5.63 5.24 5.72 5.77 5.58 5.62 5.34 5.57 5.81 5.74 ...
-#$ SOM                     : num  13.5 12 7.6 3.8 17.6 ...
-#$ ResponsiblePerson       : Factor w/ 10 levels "","Arttu","Erin",..: 4 4 6 6 5 5 9 9 9 3 ...
-#$ Notes                   : Factor w/ 21 levels "","clay soil with too much water",..: 7 12 14 20 6 19 3 1 9 13 ...
-#$ X10_5_TSA_Plate         : Factor w/ 17 levels "","0","1","103",..: 10 4 12 5 14 17 15 11 6 13 ...
-#$ X10_6_TSA_Plate         : int  1 12 1 1 3 5 6 2 4 10 ...
-#$ X10_7_TSA_Plate         : int  0 3 3 0 0 1 0 0 0 1 ...
-#$ X10_4_Malt_Plate        : int  18 30 11 7 17 12 1 2 0 8 ...
-#$ X10_5_Malt_Plate        : int  8 6 1 1 3 1 0 0 0 2 ...
-#$ X10_6_Malt_Plate        : int  0 1 0 0 1 0 0 0 0 1 ...
-#$ Other_plate_observations: Factor w/ 6 levels "","10-5 malt plate had fungal growth",..: 1 1 1 1 2 5 1 1 1 1 ...
-#$ ASV_divSha              : num  7.19 7.33 7.2 7.07 7.27 ...
+```
 
 
-# So lets plot all variables that make sense to look at 
+So lets plot all variables that make sense to look at 
 
+```{r}
 ggplot(MMB117metadata, aes(Sample, SnowDepth, label=Site)) +
  geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
 geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Snow depth")
+```
 
-# not recorded for all, maybe can be left put from the analysis
+Not recorded for all, maybe can be left out from the analysis
 
+```{r}
 ggplot(MMB117metadata, aes(Sample,  WetWeight, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Wet weight (g)")
-
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
-
 
 ggplot(MMB117metadata, aes(Sample,  DryWeight, label=Site)) +
   geom_point(color="black", size=3)+
@@ -234,37 +197,20 @@ ggplot(MMB117metadata, aes(Sample,  DryWeight, label=Site)) +
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Dry weight (air dried) (g)")
 
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
-
-
 ggplot(MMB117metadata, aes(Sample,  X80C_DryWeight, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Owen dry weight, pore water dried out (g)")
 
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
+```
 
-# negative control
-
-
+```{r}
 ggplot(MMB117metadata, aes(Sample,  DNAWeight, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
 ggtitle("What was weighed for DNA extraction (mg)")
-
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
 
 
 ggplot(MMB117metadata, aes(Sample,  Moisture, label=Site)) +
@@ -272,59 +218,43 @@ ggplot(MMB117metadata, aes(Sample,  Moisture, label=Site)) +
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Soil water % (?)")
-
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
-
-#Gravimetric water content would be better than "moisture", you could change the column. 
-#There are some that are very wet. 
-#Interesting to see if their microbiome is completely different because of the snow for instance
+```
 
 
+Gravimetric water content would be better than "moisture", you could change the column. 
+There are some that are very wet. 
+Interesting to see if their microbiome is completely different because of the snow for instance
+
+```{r}
 ggplot(MMB117metadata, aes(Sample,  pH_W, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Water-extraxted pH")
 
-
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
-
-
 ggplot(MMB117metadata, aes(Sample,  pH_Ca, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("CaCl2-extraxted pH")
+```
 
-# nice grouping!!
+Nice grouping!!
 
-# With both pH's actually
+With both pH's actually
 
-#Warning messages:
-#1: Removed 1 row containing missing values or values outside the scale range (`geom_point()`). 
-#2: Removed 1 row containing missing values or values outside the scale range (`geom_text_repel()`). 
-
-# negative control
-
-
+```{r}
 ggplot(MMB117metadata, aes(Sample,  SOM, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
   geom_text_repel(color="black",size=4,max.overlaps = Inf )+
   ggtitle("Soil organic matter (LOI)")
+```
 
-# few samples that are under or above but not too extreme I would say
-# some missing data as well
+Few samples that are under or above but not too extreme I would say
+Some missing data as well
 
-
+```{r}
 ggplot(MMB117metadata, aes(Sample,  ASV_divSha, label=Site)) +
   geom_point(color="black", size=3)+
   theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
@@ -338,37 +268,31 @@ plot(metaMDS(ASV_tableRA.mat[2:25,]), type="text", display="sites")
 # and not really
 
 plot(metaMDS(ASV_tableRA.mat[2:25,]))
+```
 
-# this shows both the species and sites and from this we cans see that different 
-# species associate to different sites
+This shows both the species and sites and from this we cans see that different species associate to different sites
 
-              ##----------------------------- ##
+__Good! looks like there are no weird extreme cases in the data.__
 
-# Good! looks like there are no weird extreme cases in the data.
+## Homogenity of variances
 
-###################################################################
+With statistical analyses we usually compare means, so if the black lines are in different levels, that is fine.  
+But the variability of the observations should be similar. i.e. the size of the boxes should be about the same
 
-# --- Homogenity of variances --- #
+So lets check this with metadata and Shannons diversity index
 
-# With statistical analyses we usually compare means, so if the black lines are in different levels,
-# that is fine. 
-# but the variability of the observations should be similar. 
-# i.e. the size of the boxes should be about the same
-
-# So lets check this with metadata and Shannons diversity index
-
+```{r}
 ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  Moisture)) + 
   geom_boxplot() +
   theme_bw(base_size = 14)+
   theme(panel.border = element_rect(colour = "black"))+
   theme(legend.position="none")
+```
 
+whoops! Good thing we are not studying change of soil water % in response to land use!
+But I wouldn't build a linear model using soil water % as an explaining variable. non-parametric statistical test would be probably ok.
 
-# whoops! Good thing we are not studying change of soil water % in response to land use!
-# but I wouldn't build a linear model using soil water % as an explaining variable.
-# non-parametric statistical test would be probably ok.
-
-
+```{r}
 ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  pH_W)) + 
   geom_boxplot() +
   theme_bw(base_size = 14)+
@@ -390,89 +314,76 @@ ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  SOM)) +
   theme_bw(base_size = 14)+
   theme(panel.border = element_rect(colour = "black"))+
   theme(legend.position="none")
+```
 
-#Warning message:
-#Removed 3 rows containing non-finite outside the scale range (`stat_boxplot()`). 
+Some samples dont have SOM -values
 
-# Some samples dont have SOM -values
+Gas station is "in another planet", so SOM as an X-variable of a linear model would probably be a bad idea.
 
-# Gas station is "in another planet", so SOM as an X-variable of a linear model would probably be a bad idea.
-
+```{r}
 ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  ASV_divSha)) + 
   geom_boxplot() +
   theme_bw(base_size = 14)+
   theme(panel.border = element_rect(colour = "black"))+
   theme(legend.position="none")
+```
+
+Also diversity shows heterogeneity in the variances, but this probably would work in linear models as an Y-variable
+We can take these into account by selecting statistical models that that do not require homogeneity.
+If we would really need to use linear models, we could also transform these variables
+or delete observations that are outliers and go with for instance 3 observations per site.
+This is the reason why even 6 observations (6 samples) per site can bee too little!
 
 
-# Also diversity shows heterogeneity in the variances, but this probably would work in linear models as an Y-variable
+### Normality
 
-                          ##----------------------------- ##
+Often people say that the data should be normally distributed, 
+if you want to apply linear models.  
+This is not exactly true: The normality should be met at each X value. 
+This is of difficult to check if the data does not have multiple 
+observations for each X and we don't. 
+In other words, the Y-data contains the effects of all the explanatory variables (all metadata).
+Therefore it is misleading to assess normality according the Y data.
+Better choice is to apply a model and plot the pooled residuals. 
+Since the linear models should be LINEAR, the residuals should have 
+the same distance to fitted values (predicted means). If they do not, 
+then the model is not linear and the plot of residuals against fitted 
+values will show a curve or some other pattern. This means that 
+the RESIDUALS should be normally distributed, if linear models are used.
 
-# We can take these into account by selecting statistical models that that do not require homogeneity.
-# If we would really need to use linear models, we could also transform these variables
-# or delete observations that are outliers and go with for instance 3 observations per site.
-# This is the reason why even 6 observations (6 samples) per site can bee too little!
+We know this about normal distribution:
+ "It is a continuous probability distribution in which the random variable can take any value." 
+With TSS-normalization, our values are "relative abundances", so something between 0 and 1.
+So relative abundances don't meet the normality assumption and we cannot use a model that 
+assumes normality with TSS-normalized data.
+
+Relative abundances are proportions, so the probability distribution to use with them would be 
+Beta distribution, but according to my experience, Gamma distribution works also 
+Gamma distribution is used to model positive continuous variables that represent time intervals between events, 
+the Beta distribution is used to model continuous variables that represent proportions or probabilities
+Gamma models work very well, I have had trouble with Beta
 
 
-###############################################################################################
+But what should be normally distributed even though it would be calculated from relative abundances:
+Shannon's diversity index
+Some metadata variables (that are not %) would be normally distributed, for instance pH.
 
-# --- Normality --- #
+### Fixed X
 
-#Often people say that the data should be normally distributed, 
-#if you want to apply linear models.  
-#This is not exactly true: The normality should be met at each X value. 
-#This is of difficult to check if the data does not have multiple 
-#observations for each X and we don't. 
-#In other words, the Y-data contains the effects of all the explanatory variables (all metadata).
-#Therefore it is misleading to assess normality according the Y data.
-#Better choice is to apply a model and plot the pooled residuals. 
-#Since the linear models should be LINEAR, the residuals should have 
-#the same distance to fitted values (predicted means). If they do not, 
-#then the model is not linear and the plot of residuals against fitted 
-#values will show a curve or some other pattern. This means that 
-#the RESIDUALS should be normally distributed, if linear models are used.
+This assumption means that you know the values of X for each sample in advance. 
+You can have e.g. different fertilization rates, treatments, etc. 
+This assumption is violated, if you for instance study some parameter of animals,
+which happen to be found somewhere and your X is for example the age of animals. In other words, 
+this assumption is violated if the X is randomly selected.
 
-#We know this about normal distribution:
-# "It is a continuous probability distribution in which the random variable can take any value." 
-#With TSS-normalization, our values are "relative abundances", so something between 0 and 1.
-#So relative abundances don't meet the normality assumption and we cannot use a model that 
-#assumes normality with TSS-normalized data.
+we don't have this problem.
 
-# Relative abundances are proportions, so the probability distribution to use with them would be 
-# Beta distribution, but according to my experience, Gamma distribution works also 
-# Gamma distribution is used to model positive continuous variables that represent time intervals between events, 
-# the Beta distribution is used to model continuous variables that represent proportions or probabilities
-# Gamma models work very well, I have had trouble with Beta
+### Zero trouble in  Y-data
 
-#######################################################################################################
-# But what should be normally distributed even though it would be calculated from relative abundances:
-# Shannon's diversity index
-#####################################################################################################
-#####################################################################################################
-# Some metadata variables (that are not %) would be normally distributed, for instance pH.
-#####################################################################################################
+if most observations are zeros
+we probable have many zeros, at least in the ASV and genera levels
 
-# tehäänkö tähän liittyen jotain? äänestän et ei. Tää voi mennä teorialla, menee liian vaikeeksi muuten ja ohi asian
-
-# ---  "Fixed X" --- #
-
-#This assumption means that you know the values of X for each sample in advance. 
-#You can have e.g. different fertilization rates, treatments, etc. 
-#This assumption is violated, if you for instance study some parameter of animals,
-#which happen to be found somewhere and your X is for example the age of animals. In other words, 
-#this assumption is violated if the X is randomly selected.
-
-# we don't have this problem
-
-###########################################################################################################
-
-# ---  Zero trouble in  Y-data  --- #
-
-# if most observations are zeros
-
-# we probable have many zeros, at least in the ASV and genera levels
-
+```{r}
 range(ASV_tableRA.mat_o)
 # [1] 0.0000000 0.1498224
 
@@ -480,19 +391,19 @@ plot(c(ASV_tableRA.mat_o))
 
 # and it seems we do. So if we would like to apply linear models using taxa as the response variables,
 # we might need to consider zero-inflated models
-
-###########################################################################################################
-
-# --- Collinearity in X and # --- Relationships Y & X --- #
-
-#If X-observations correlate, for instance weight and length, or water depth and distance to the shoreline. 
-#If collinearity is ignored, one is likely to end up with a confusing statistical analysis in which nothing 
-#is significant, but where dropping one covariate can make the others significant, 
-#or even change the sign of estimated parameters.
-
-# collinearity can be detected with pairwise scatter plots comparing covariates,
+```
 
 
+### Collinearity in X and relationships Y & X
+
+If X-observations correlate, for instance weight and length, or water depth and distance to the shoreline. 
+If collinearity is ignored, one is likely to end up with a confusing statistical analysis in which nothing 
+is significant, but where dropping one covariate can make the others significant, 
+or even change the sign of estimated parameters.
+
+collinearity can be detected with pairwise scatter plots comparing covariates,
+
+```{r}
 plot(MMB117metadata[,c(8:11)])
 
 # pH water and pH CaCl2 seem to correlate, as they should. But because of the collinearity issue both of them cannot be used in a model
@@ -506,22 +417,19 @@ plot(MMB117metadata[,c(8:11,21)])
 
 # So if we would do linear models and use diversity as the response variable, we might need to consider
 # water %, pH (one of them) and SOM %
+```
 
-###########################################################################################################
+### Interactions?
 
-# --- Interactions? --- #
-#
 
-# This means that if we would do linear models, some of the X-variables might have an interaction and this can be taken into account
+This means that if we would do linear models, some of the X-variables might have an interaction and this can be taken into account
 
-# Let's try to visualize if we have something like this.
+Let's try to visualize if we have something like this.
 
-# I will categorize water-content
+I will categorize water-content
 
+```{r}
 summary(MMB117metadata$Moisture)
-
-#Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-# 29.24   38.50   42.16   47.19   54.97   84.68       1 
 
 Water_FirstQ<-38.50
 Water_Median<-42.16 
