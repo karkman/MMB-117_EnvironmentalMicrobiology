@@ -52,7 +52,7 @@ During the QC steps we first use `FastQC` to analyse each file separately and th
 module load biokit/11.3.0
 mkdir 01_RAW/FASTQC
 
-fastqc --outdir 01_RAW/FASTQC 01_RAW/*.fastq.gz --threads $SLURM_CPUS_PER_TASK
+fastqc --outdir 01_RAW/FASTQC 01_RAW/*.fastq.gz --threads 4
 module purge
 
 module load multiqc/1.19
@@ -77,7 +77,7 @@ for sample in $(cat sample_names.txt); do
         -G YYYY \
         -O 10 \
         --discard-untrimmed \
-        --cores $SLURM_CPUS_PER_TASK \
+        --cores 4 \
         01_RAW/*${sample}*_R1_001.fastq.gz \
         01_RAW/*${sample}*_R2_001.fastq.gz \
         -o 02_TRIMMED/${sample}_trimmed_1.fastq.gz \
