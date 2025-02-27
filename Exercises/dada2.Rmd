@@ -5,6 +5,8 @@ And we need to set the working directory to our course folder. So change the "US
 And then run the code block below.  
 
 ```{r setup}
+setwd("PATH_TO_YOUR_WORKING_DIRECTORY")
+
 .libPaths(c("/projappl/project_201312/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
