@@ -15,7 +15,7 @@ library(tidyverse)
 ```
 
 
-```r
+```{r}
 library(dada2)
 
 path <- "02_TRIMMED/"
@@ -81,7 +81,7 @@ Statistical analysis part
 
 Use R 4.2.1
 
-```r
+```{r}
 .libPaths(c("/users/antkark/projappl/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
@@ -106,7 +106,7 @@ saveRDS(physeq, "physeq.rds")
 
 Data analysis
 
-```r
+```{r}
 library(microViz)
 
 physeq <- readRDS("physeq.rds")
