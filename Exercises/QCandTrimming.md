@@ -65,7 +65,7 @@ Before going to the primer removal step, we'll go thru the multiQC reports toget
 
 ## Primer removal
 
-Since the amplification will create artificial sequences at the primer sites (all identical to the primers), we need to remove those before running any further analyses. You will need the primer sequences for this step.  
+Since the amplification will create artificial sequences at the primer sites (all identical to the primers), we need to remove those before running any further analyses. You will need the primer sequences for this step. Also check the `cutadapt` manual for the other options were using.  
 
 ```bash
 module load cutadapt/4.9
@@ -92,7 +92,7 @@ Have a look at the cutadapt log files, did the reads contain the primers? How mu
 
 ## Quality control for trimmed data
 
-Its good practice to check the data quality once more to make sure everything is OK. Run the same QC steps to the trimmmed data. You need to fill in the correct paths to input and output files, and any relevant options for both steps.  
+It's good practice to check the data quality once more to make sure everything is OK. Run the same QC steps to the trimmmed data. You need to fill in the correct paths to input and output files, and any relevant options for both steps.  
 
 ```bash
 module load biokit/11.3.0
