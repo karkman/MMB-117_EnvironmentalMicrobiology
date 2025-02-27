@@ -4,27 +4,28 @@
 ## Libraries
 
 ```{r}
-library(reshape2)
-library(dplyr)
-library(tidyr)
-library(MASS)
-library(vegan)
-library(ggplot2)
-library(ggthemes)
-library(colorspace)
-library(colorRamps)
-library(RColorBrewer)
-library(gridExtra)
-library(fitdistrplus)
-library(logspline)
-library(car)
-library(lme4)
-# library(multcomp)
-library(scales)
-library(viridis)
-library(ggrepel)
-library(pheatmap)
-# library(psych)
+library(tidyverse)
+# library(reshape2)
+# library(dplyr)
+# library(tidyr)
+# library(MASS)
+# library(vegan)
+# library(ggplot2)
+# library(ggthemes)
+# library(colorspace)
+# library(colorRamps)
+# library(RColorBrewer)
+# library(gridExtra)
+# library(fitdistrplus)
+# library(logspline)
+# library(car)
+# library(lme4)
+# # library(multcomp)
+# library(scales)
+# library(viridis)
+# library(ggrepel)
+# library(pheatmap)
+# # library(psych)
 ```
 
 
@@ -36,10 +37,10 @@ setwd("PATH/TO/COURSE/FOLDER")
 
 Read in matadata
 ```{r}
-MMB117metadata <- read.table("MMB117_Sample_sheet_2025.txt", header = TRUE, stringsAsFactors = TRUE, sep = "\t")
+MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t")
 
 View(MMB117metadata)
-MMB117metadata <- MMB117metadata[1:25, 1:20]
+#MMB117metadata <- MMB117metadata[1:25, 1:20]
 ```
 
 ## Read in data
