@@ -1,6 +1,6 @@
-data/*
-.snakemake/*
-trimmed_data/*
+00_LOGS/*
+01_RAW/*
+02_TRIMMED/*
 lectures/*
 materials/*
 .DS_Store
