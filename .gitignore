@@ -10,3 +10,4 @@ materials/*
 workflow
 doc/*.r
 src/*.r
+*.Rhistory
