@@ -18,13 +18,13 @@ library(gridExtra)
 library(fitdistrplus)
 library(logspline)
 library(car)
-library(lme4) 
-#library(multcomp)
+library(lme4)
+# library(multcomp)
 library(scales)
 library(viridis)
 library(ggrepel)
 library(pheatmap)
-#library(psych)
+# library(psych)
 ```
 
 
@@ -36,10 +36,10 @@ setwd("PATH/TO/COURSE/FOLDER")
 
 Read in matadata
 ```{r}
-MMB117metadata <- read.table("MMB117_Sample_sheet_2025.txt", header=TRUE, stringsAsFactors = TRUE, sep="\t")
+MMB117metadata <- read.table("MMB117_Sample_sheet_2025.txt", header = TRUE, stringsAsFactors = TRUE, sep = "\t")
 
 View(MMB117metadata)
-MMB117metadata<-MMB117metadata[1:25,1:20]
+MMB117metadata <- MMB117metadata[1:25, 1:20]
 ```
 
 ## Read in data
@@ -56,7 +56,7 @@ str(tax_table)
 View(tax_table)
 
 identical(rownames(tax_table), colnames(ASV_table))
-#[1] TRUE
+# [1] TRUE
 
 head(rownames(tax_table))
 
@@ -74,12 +74,12 @@ ASV_counts_per_sampleDF <- as.data.frame(rowSums(ASV_table))
 dim(ASV_table)
 # [1]    26 20262
 
-dim(ASV_table[, which(colSums(ASV_table)<3)])
-#[1]  26 606
+dim(ASV_table[, which(colSums(ASV_table) < 3)])
+# [1]  26 606
 
 # One could remove these
 
-#ASV_table_over3<-ASV_table[, which(colSums(ASV_table)>3)]
+# ASV_table_over3<-ASV_table[, which(colSums(ASV_table)>3)]
 
 str(ASV_table)
 class(ASV_table)

@@ -10,7 +10,7 @@ This repository will be copied to Puhti during the exercises. So you will have a
 
 Exercises for this course:
 
-- Preprocessing: [Exercises/QCandTrimming.md](Exercises/QCandTrimming.md).  
+- Pre-processing: [Exercises/QCandTrimming.md](Exercises/QCandTrimming.md).  
 - DADA2 pipeline: [Exercises/dada2.Rmd](Exercises/dada2.Rmd).  
 - Data exploration: [Exercises/DataExploration.Rmd](Exercises/DataExploration.Rmd)
 - Statistical analyses: [Exercises/StatisticalAnalyses.Rmd](Exercises/StatisticalAnalyses.Rmd)
