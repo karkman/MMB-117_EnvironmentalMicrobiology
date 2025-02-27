@@ -16,13 +16,12 @@ library(microViz)
 library(tidyverse)
 ```
 
+Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.
+And get the samples names from the names of the read files (from R1 read files to be precise.)
 
-```r
-library(dada2)
-
+```{r}
 path <- "02_TRIMMED/"
 
-# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
 # Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
@@ -83,7 +82,7 @@ Statistical analysis part
 
 Use R 4.2.1
 
-```r
+```{r}
 .libPaths(c("/users/antkark/projappl/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
@@ -106,9 +105,9 @@ sample_data(physeq) <- physeq_meta %>% sample_data()
 saveRDS(physeq, "physeq.rds")
 ```
 
-Data analysis
+Preliminary community data exploration
 
-```r
+```{r}
 library(microViz)
 
 physeq <- readRDS("physeq.rds")
