@@ -1,0 +1,7 @@
+# Data exploration and statistical analyses
+
+Lorem ipsum 
+
+```{r}
+library(tidyverse)
+```
