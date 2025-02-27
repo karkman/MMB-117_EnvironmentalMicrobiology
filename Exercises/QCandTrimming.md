@@ -26,7 +26,7 @@ cd MMB-117_EnvironmentalMicrobiology
 
 Now we have a workig directory for the course that has all the instructions as well. So if you're using VS Code, you can open the instructions in VS Code. You can also check the full path to this folder to make it easier to navigate here in the future.  
 
-Next we will make some folders and copy the raw sequencing data to the right folder.  
+Next we will make some folders and copy the raw sequencing data to the `01_RAW` folder.  
 
 ```bash
 mkdir -p 00_LOGS
@@ -34,7 +34,10 @@ mkdir -p 01_RAW
 cp /scratch/project_XXX/DATA/*.fastq.gz 01_RAW/
 ```
 
-Make a list of all sample names. After creating the file, you can check the content of it.  
+Check how many files were copied and does that correspond to what we should have.  
+
+If all is good, make a list of all sample names. The one-liner first lists all R1 files, then splits each name by "-" and prints the 2nd and 3rd fields to file called `sample_names.txt`.  
+After creating the file, you can check the content of it.  
 
 ```bash
 ls 01_RAW/*R1*.fastq.gz | cut -d "-" -f 2,3 > sample_names.txt
@@ -42,8 +45,8 @@ ls 01_RAW/*R1*.fastq.gz | cut -d "-" -f 2,3 > sample_names.txt
 
 ## Sequence data quality control
 
-For the next steps we need some computing resources, so apply for resources and run the QC steps.  
-
+For the next steps we need some computing resources (4h, 5G and 4 CPUs), so first applu the resources and then run the QC steps below.  
+During the QC steps we first use `FastQC` to analyse each file separately and then combine all reports with `MultiQC`.  
 
 ```bash
 module load biokit/11.3.0
@@ -58,7 +61,11 @@ multiqc --interactive --outdir 01_RAW/FASTQC 01_RAW/FASTQC/
 module purge
 ```
 
-Primer removal 
+Before going to the primer removal step, we'll go thru the multiQC reports together.  
+
+## Primer removal
+
+Since the amplification will create artificial sequences at the primer sites (all identical to the primers), we need to remove those before running any further analyses. You will need the primer sequences for this step.  
 
 ```bash
 module load cutadapt/4.9
@@ -66,31 +73,37 @@ mkdir -p 02_TRIMMED
 
 for sample in $(cat sample_names.txt); do 
     cutadapt \
-    -g CCTACGGGNGGCWGCAG \
-    -G GACTACHVGGGTATCTAATCC \
-    -O 10 \
-	--discard-untrimmed \
-    --cores $SLURM_CPUS_PER_TASK \
-    01_RAW/*${sample}*_R1_001.fastq.gz \
-    01_RAW/*${sample}*_R2_001.fastq.gz \
-    -o 02_TRIMMED/${sample}_trimmed_1.fastq.gz \
-    -p 02_TRIMMED/${sample}_trimmed_2.fastq.gz \
-    > 02_TRIMMED/${sample}.log
+        -g XXXX \
+        -G YYYY \
+        -O 10 \
+        --discard-untrimmed \
+        --cores $SLURM_CPUS_PER_TASK \
+        01_RAW/*${sample}*_R1_001.fastq.gz \
+        01_RAW/*${sample}*_R2_001.fastq.gz \
+        -o 02_TRIMMED/${sample}_trimmed_1.fastq.gz \
+        -p 02_TRIMMED/${sample}_trimmed_2.fastq.gz \
+        > 02_TRIMMED/${sample}.log
 done
 
 module purge
 ```
 
-Trimmed QC
+Have a look at the cutadapt log files, did the reads contain the primers? How much data was removed?  
+
+## Quality control for trimmed data
+
+Its good practice to check the data quality once more to make sure everything is OK. Run the same QC steps to the trimmmed data. You need to fill in the correct paths to input and output files, and any relevant options for both steps.  
 
 ```bash
 module load biokit/11.3.0
 mkdir 02_TRIMMED/FASTQC
 
-fastqc --outdir 02_TRIMMED/FASTQC 02_TRIMMED/*.fastq.gz --threads $SLURM_CPUS_PER_TASK
+fastqc 
 module purge
 
 module load multiqc/1.19
-multiqc --interactive --outdir 02_TRIMMED/FASTQC 02_TRIMMED/FASTQC
+multiqc
 module purge
 ```
+
+Now we should have read files with primers removed and we can proceed to the ASV part with DADA2 in R.
