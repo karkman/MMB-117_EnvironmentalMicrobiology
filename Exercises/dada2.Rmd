@@ -35,39 +35,61 @@ filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
+```
 
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,220),
-              maxN=0, maxEE=c(1,1), truncQ=2, rm.phix=TRUE,
+Then we can quality trim the reads, but first we need to decide some the trimming parameters based on the quality plots.
+Before running the trimming command, set the trimming length (`truncLen`) and the maximum expected errors (`maxEE`) per read.
+
+```{r}
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX,YYY),
+              maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE)
 out
+```
 
+
+```{r}
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
+```
 
+```{r}
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
+```
 
+```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
 dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
 
+```{r}
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+```
 
+```{r}
 seqtab <- makeSequenceTable(mergers)
 dim(seqtab)
 table(nchar(getSequences(seqtab)))
+```
 
+```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+
 dim(seqtab.nochim)
-
 sum(seqtab.nochim)/sum(seqtab)
+```
 
+```{r}
 getN <- function(x) sum(getUniques(x))
 track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
 
 colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
 rownames(track) <- sample.names
 track
+```
 
+```{r}
 taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread=TRUE)
 
 taxa.print <- taxa 
