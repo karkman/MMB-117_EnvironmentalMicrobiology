@@ -1,7 +1,7 @@
 00_LOGS/*
 01_RAW/*
 02_TRIMMED/*
-lectures/*
+Lectures/*.pptx
 materials/*
 .DS_Store
 .ipynb_checkpoints
