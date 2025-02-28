@@ -154,7 +154,8 @@ saveRDS(seqtab.nochim, "seqtab.rds")
 ```
 
 
-Then we can assign taxonomy to the ASVs.
+Then we can assign taxonomy to the ASVs. And print the first few rows of the taxonomy table.  
+This will again take some time.  
 
 ```{r "taxonomy", eval=FALSE}
 taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2013123/DB/silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
