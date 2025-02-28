@@ -9,8 +9,7 @@ the path to your own working directory below. And then run the code
 block below.
 
 ``` r
-# workdir <- "/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology"
-# setwd(/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology)
+setwd("PATH_TO_COURSE_FOLDER")
 
 .libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]

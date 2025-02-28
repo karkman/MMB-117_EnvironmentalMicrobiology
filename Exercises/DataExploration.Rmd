@@ -1,9 +1,23 @@
-# Data Exploration
+---
+title: MMB-117
+output: 
+        github_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        fig_caption: true
+        keep_md: true
+        highlight: tango
+        theme: united
+        dev: svg
+        self_contained: no
+---
 
+# Data Exploration
 
 ## Libraries
 
-```{r}
+```{r "libraries"}
 library(tidyverse)
 # library(reshape2)
 # library(dplyr)

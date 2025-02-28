@@ -1,7 +1,22 @@
-# Data exploration and statistical analyses
+---
+title: MMB-117
+output: 
+        github_document:
+        toc: true
+        toc_float: true
+        number_sections: true
+        fig_caption: true
+        keep_md: true
+        highlight: tango
+        theme: united
+        dev: svg
+        self_contained: no
+---
+
+# Statistical analyses
 
 Lorem ipsum 
 
-```{r}
+```{r "libraries"}
 library(tidyverse)
 ```
