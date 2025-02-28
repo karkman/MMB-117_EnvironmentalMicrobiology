@@ -1,7 +1,7 @@
 # DADA2 pipeline
 
 We need some R packages to run the analyses.  
-And we need to set the working directory to our course folder. So change the "USERNAME" to your own username below.
+And we need to set the working directory to our course folder. So change the path to your own working directory below.
 And then run the code block below.  
 
 ```{r setup}
@@ -24,13 +24,19 @@ path <- "02_TRIMMED/"
 
 fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
-# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
-sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+```
+
+To be able to decide the trimming parameters, we'll plot the quality profiles from first six read files. Separately for R1 and R2 reads.
+
+```{r}
 plotQualityProfile(fnFs[3:6])
 plotQualityProfile(fnRs[1:6])
+```
 
-# Place filtered files in filtered/ subdirectory
+Before stating to trim the reads, we define the output files for the trimmed reads.
+```{r}
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
 names(filtFs) <- sample.names
@@ -47,31 +53,37 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX,YYY),
 out
 ```
 
-
+Next we will learn the error rates from the data and denoise the data.
 ```{r}
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 ```
 
+And plot the error profiles.
 ```{r}
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
 ```
 
+Then we can denoise the data.
 ```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
 dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
 ```
 
+And merge the forward and reverse reads.
 ```{r}
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 ```
 
+And convert it to a sequence table.
 ```{r}
 seqtab <- makeSequenceTable(mergers)
 dim(seqtab)
 table(nchar(getSequences(seqtab)))
 ```
+
+Now we can remove the chimeras from the data and check the proportion of the data that is left.
 
 ```{r}
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
@@ -79,6 +91,8 @@ seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE
 dim(seqtab.nochim)
 sum(seqtab.nochim)/sum(seqtab)
 ```
+
+Last part is to track the data through the pipeline. 
 
 ```{r}
 getN <- function(x) sum(getUniques(x))
@@ -88,6 +102,8 @@ colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "n
 rownames(track) <- sample.names
 track
 ```
+
+If everything looks fine, we can assign taxonomy to the ASVs.
 
 ```{r}
 taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread=TRUE)
@@ -100,11 +116,14 @@ saveRDS(seqtab.nochim, "seqtab.rds")
 saveRDS(taxa, "taxa.rds")
 ```
 
-Statistical analysis part
+The DADA2 pipleine is done and we have the ASV table and the taxonomy table saved as RDS files.
+We can move on to some preliminary data visualization and exploration.
+
+First we make a phyloseq object from the ASV and taxonomy tables. You don't to read the RDS files again, if you have not closed the R session.
+We will also add the metadata to the phyloseq object and store the ASV sequences as a separate data in the phyloseq object.  
+The ASVs are named as their sequences at this stage and we will rename them with ASV and a running number.  
 
 ```{r}
-library(phyloseq)
-
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
 
@@ -123,11 +142,9 @@ sample_data(physeq) <- physeq_meta %>% sample_data()
 saveRDS(physeq, "physeq.rds")
 ```
 
-Preliminary community data exploration
+Preliminary community data exploration using microViz package. Again, you don't need to read the RDS file again, if you have not closed the R session.
 
 ```{r}
-library(microViz)
-
 physeq <- readRDS("physeq.rds")
 
 ord_explore(physeq)
