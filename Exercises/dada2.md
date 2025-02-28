@@ -1,6 +1,5 @@
-MMB-117 DADA2 pipeline
+MMB-117
 ================
-Antti Karkman
 
 # DADA2 pipeline
 
@@ -10,8 +9,8 @@ the path to your own working directory below. And then run the code
 block below.
 
 ``` r
-#workdir <- "/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology"
-#setwd(/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology)
+# workdir <- "/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology"
+# setwd(/scratch/project_2013123/antkark/MMB-117_EnvironmentalMicrobiology)
 
 .libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
@@ -27,10 +26,10 @@ and one for R2 read files. And get the samples names from the names of
 the read files (from R1 read files to be precise.)
 
 ``` r
-path <- paste0(getwd(),"/02_TRIMMED/")
+path <- paste0(getwd(), "/02_TRIMMED/")
 
-fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
+fnFs <- sort(list.files(path, pattern = "_trimmed_1.fastq.gz", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern = "_trimmed_2.fastq.gz", full.names = TRUE))
 
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```
@@ -59,37 +58,39 @@ trimming command, set the trimming length (`truncLen`) and the maximum
 expected errors (`maxEE`) per read.
 
 ``` r
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(XXX,YYY),
-              maxN=0, maxEE=c(X,X), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=TRUE)
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+    truncLen = c(XXX, YYY),
+    maxN = 0, maxEE = c(X, X), truncQ = 2, rm.phix = TRUE,
+    compress = TRUE, multithread = TRUE
+)
 out
 ```
 
 Next we will learn the error rates from the data and denoise the data.
 
 ``` r
-errF <- learnErrors(filtFs, multithread=TRUE)
-errR <- learnErrors(filtRs, multithread=TRUE)
+errF <- learnErrors(filtFs, multithread = TRUE)
+errR <- learnErrors(filtRs, multithread = TRUE)
 ```
 
 And plot the error profiles.
 
 ``` r
-plotErrors(errF, nominalQ=TRUE)
-plotErrors(errR, nominalQ=TRUE)
+plotErrors(errF, nominalQ = TRUE)
+plotErrors(errR, nominalQ = TRUE)
 ```
 
 Then we can denoise the data.
 
 ``` r
-dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
-dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+dadaFs <- dada(filtFs, err = errF, multithread = TRUE)
+dadaRs <- dada(filtRs, err = errR, multithread = TRUE)
 ```
 
 And merge the forward and reverse reads.
 
 ``` r
-mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose = TRUE)
 ```
 
 And convert it to a sequence table.
@@ -104,10 +105,10 @@ Now we can remove the chimeras from the data and check the proportion of
 the data that is left.
 
 ``` r
-seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+seqtab.nochim <- removeBimeraDenovo(seqtab, method = "consensus", multithread = TRUE, verbose = TRUE)
 
 dim(seqtab.nochim)
-sum(seqtab.nochim)/sum(seqtab)
+sum(seqtab.nochim) / sum(seqtab)
 ```
 
 Last part is to track the data through the pipeline.
@@ -124,9 +125,9 @@ track
 If everything looks fine, we can assign taxonomy to the ASVs.
 
 ``` r
-taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread=TRUE)
+taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
 
-taxa.print <- taxa 
+taxa.print <- taxa
 rownames(taxa.print) <- NULL
 head(taxa.print)
 
@@ -149,7 +150,7 @@ them with ASV and a running number.
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
 
-physeq <- phyloseq(otu_table(ASV_table, taxa_are_rows=FALSE), tax_table(as.matrix(TAX_table)))
+physeq <- phyloseq(otu_table(ASV_table, taxa_are_rows = FALSE), tax_table(as.matrix(TAX_table)))
 
 dna <- Biostrings::DNAStringSet(taxa_names(physeq))
 names(dna) <- taxa_names(physeq)
@@ -158,7 +159,7 @@ physeq <- merge_phyloseq(physeq, dna)
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
 
-physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim=";", locale=locale(decimal_mark = ",")) %>% column_to_rownames("Run")
+physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim = ";", locale = locale(decimal_mark = ",")) %>% column_to_rownames("Run")
 sample_data(physeq) <- physeq_meta %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")
