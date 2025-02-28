@@ -25,4 +25,3 @@ FO_05	Forest	15	10.057	7.29	7.2	277	39.7	4.9	3.79	8.54	small roots, small rocks,
 FO_06	Forest	15	10.339	6.64	6.51	307	58.8	4.7	3.79	16.55	small roots, loose, several bugs, 15 cm of snow	NA	NA	NA	NA	NA	NA	biofilm
 CTRL-TATCCAGT	Control	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
 BI-PCR	Control	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
-NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
