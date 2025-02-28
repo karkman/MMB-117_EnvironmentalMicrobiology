@@ -3,10 +3,11 @@ MMB-117
 
 # DADA2 pipeline
 
-For this step you need to allocate 8h, 50Gbb and 4 cores.
+For this pipeline you need to open a RStudio session and allocate 8h,
+50Gbb and 4 cores.
 
-We will use the DADA2 pipeline to process the 16S rRNA data. The
-pipeline consists of the following steps:  
+We will use the DADA2 to process the 16S rRNA data.  
+The pipeline consists of the following steps:  
 1. Quality filtering and trimming  
 2. Learning the error rates  
 3. Denoising the data  
@@ -22,7 +23,7 @@ the path to your own working directory below. And then run the code
 block below.
 
 ``` r
-workdir="PATH_TO_WORKDIR"
+workdir <- "PATH_TO_WORKDIR"
 setwd(workdir)
 
 .libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
@@ -172,7 +173,7 @@ The ASVs are named as their sequences at this stage and we will rename
 them with ASV and a running number.
 
 ``` r
-workdir="PATH_TO_WORKDIR"
+workdir <- "PATH_TO_WORKDIR"
 
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
@@ -185,7 +186,7 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-MMB117metadata <- read_delim(paste0(workdir,"doc/metadata.txt"), delim = "\t") %>% column_to_rownames("Sample")
+MMB117metadata <- read_delim(paste0(workdir, "doc/metadata.txt"), delim = "\t") %>% column_to_rownames("Sample")
 sample_data(physeq) <- MMB117metadata %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")
