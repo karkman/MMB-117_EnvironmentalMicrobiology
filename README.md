@@ -8,6 +8,8 @@ To be able to access Puhti and do the exercises, you need a CSC account and need
 
 This repository will be copied to Puhti during the exercises. So you will have all the materials in your working directory in Puhti.
 
+All slides can be found from [Lectures](Lectures/)
+
 Exercises for this course:
 
 - [Pre-processing](Exercises/QCandTrimming.md)  
