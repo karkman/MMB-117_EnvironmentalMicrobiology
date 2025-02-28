@@ -75,7 +75,9 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
 out
 ```
 
-Next we will learn the error rates from the data and denoise the data.
+Next we will learn the error rates from the data and denoise the data.  
+We’ll use a bit less data for this step to speed up the process (default
+is 1e8).
 
 ``` r
 errF <- learnErrors(filtFs, multithread = TRUE, nbases = 1e7)
@@ -109,7 +111,8 @@ And merge the forward and reverse reads.
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose = TRUE)
 ```
 
-And convert it to a sequence table.
+And convert it to a sequence table and print the dimensions and the
+length distribution of the ASVs.
 
 ``` r
 seqtab <- makeSequenceTable(mergers)
@@ -138,16 +141,18 @@ rownames(track) <- sample.names
 track
 ```
 
-If everything looks fine, we can assign taxonomy to the ASVs.
+All the ASVs are now made and we can save the sequence table as an RDS
+file.
 
 ``` r
-taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
-
-taxa.print <- taxa
-rownames(taxa.print) <- NULL
-head(taxa.print)
-
 saveRDS(seqtab.nochim, "seqtab.rds")
+```
+
+Then we can assign taxonomy to the ASVs. And save the taxonomy table as
+an RDS file. This will again take some time.
+
+``` r
+taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2013123/DB/silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
 saveRDS(taxa, "taxa.rds")
 ```
 
@@ -163,6 +168,8 @@ The ASVs are named as their sequences at this stage and we will rename
 them with ASV and a running number.
 
 ``` r
+workdir="PATH_TO_WORKDIR"
+
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
 
@@ -174,7 +181,7 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t") %>% column_to_rownames("Sample")
+MMB117metadata <- read_delim(paste0(workdir,"doc/metadata.txt"), delim = "\t") %>% column_to_rownames("Sample")
 sample_data(physeq) <- MMB117metadata %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")

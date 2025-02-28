@@ -154,20 +154,11 @@ saveRDS(seqtab.nochim, "seqtab.rds")
 ```
 
 
-Then we can assign taxonomy to the ASVs. And print the first few rows of the taxonomy table.  
+Then we can assign taxonomy to the ASVs. And save the taxonomy table as an RDS file.
 This will again take some time.  
 
 ```{r "taxonomy", eval=FALSE}
 taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2013123/DB/silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
-
-taxa.print <- taxa
-rownames(taxa.print) <- NULL
-head(taxa.print)
-```
-
-And save the taxonomy table as an RDS file.
-
-```{r "saveTaxa", eval=FALSE}
 saveRDS(taxa, "taxa.rds")
 ```
 
@@ -179,6 +170,8 @@ We will also add the metadata to the phyloseq object and store the ASV sequences
 The ASVs are named as their sequences at this stage and we will rename them with ASV and a running number.  
 
 ```{r "phyloseq", eval=FALSE}
+workdir="PATH_TO_WORKDIR"
+
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
 
@@ -190,7 +183,7 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t") %>% column_to_rownames("Sample")
+MMB117metadata <- read_delim(paste0(workdir,"doc/metadata.txt"), delim = "\t") %>% column_to_rownames("Sample")
 sample_data(physeq) <- MMB117metadata %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")
