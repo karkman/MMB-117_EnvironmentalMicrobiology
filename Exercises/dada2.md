@@ -6,9 +6,13 @@ MMB-117
 For this step you need to allocate 8h, 50Gbb and 4 cores.
 
 We will use the DADA2 pipeline to process the 16S rRNA data. The
-pipeline consists of the following steps: 1. Quality filtering and
-trimming 2. Learning the error rates 3. Denoising the data 4. Merging
-the forward and reverse reads 5. Removing chimeras 6. Assigning taxonomy
+pipeline consists of the following steps:  
+1. Quality filtering and trimming  
+2. Learning the error rates  
+3. Denoising the data  
+4. Merging the forward and reverse reads  
+5. Removing chimeras  
+6. Assigning taxonomy
 
 But before we wtart we need some setting up.
 
