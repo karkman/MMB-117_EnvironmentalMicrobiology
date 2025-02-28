@@ -14,7 +14,7 @@ output:
 ---
 
 # DADA2 pipeline
-For this step you need to allocate 8h, 20Gbb and 4 cores.
+For this step you need to allocate 8h, 50Gbb and 4 cores.
 
 We will use the DADA2 pipeline to process the 16S rRNA data.
 The pipeline consists of the following steps:
@@ -64,6 +64,7 @@ plotQualityProfile(fnRs[1:6])
 ```
 
 Before stating to trim the reads, we define the output files for the trimmed reads.
+
 ```{r "filtFiles", eval=FALSE}
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
@@ -84,29 +85,34 @@ out
 ```
 
 Next we will learn the error rates from the data and denoise the data.
+
 ```{r "learnErrors", eval=FALSE}
 errF <- learnErrors(filtFs, multithread = TRUE)
 errR <- learnErrors(filtRs, multithread = TRUE)
 ```
 
 And plot the error profiles.
+
 ```{r "plotErrors", eval=FALSE}
 plotErrors(errF, nominalQ = TRUE)
 plotErrors(errR, nominalQ = TRUE)
 ```
 
 Then we can denoise the data.
+
 ```{r "denoise", eval=FALSE}
 dadaFs <- dada(filtFs, err = errF, multithread = TRUE)
 dadaRs <- dada(filtRs, err = errR, multithread = TRUE)
 ```
 
 And merge the forward and reverse reads.
+
 ```{r "merge", eval=FALSE}
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose = TRUE)
 ```
 
 And convert it to a sequence table.
+
 ```{r "seqtab", eval=FALSE}
 seqtab <- makeSequenceTable(mergers)
 dim(seqtab)
@@ -164,7 +170,6 @@ names(dna) <- taxa_names(physeq)
 physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
-
 
 physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim = ";", locale = locale(decimal_mark = ",")) %>% column_to_rownames("Run")
 sample_data(physeq) <- physeq_meta %>% sample_data()

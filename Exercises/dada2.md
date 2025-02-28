@@ -3,7 +3,7 @@ MMB-117
 
 # DADA2 pipeline
 
-For this step you need to allocate 8h, 20Gbb and 4 cores.
+For this step you need to allocate 8h, 50Gbb and 4 cores.
 
 We will use the DADA2 pipeline to process the 16S rRNA data. The
 pipeline consists of the following steps: 1. Quality filtering and
@@ -18,7 +18,8 @@ the path to your own working directory below. And then run the code
 block below.
 
 ``` r
-setwd("PATH_TO_COURSE_FOLDER")
+workdir="PATH_TO_WORKDIR"
+setwd(workdir)
 
 .libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
@@ -34,7 +35,7 @@ and one for R2 read files. And get the samples names from the names of
 the read files (from R1 read files to be precise.)
 
 ``` r
-path <- paste0(getwd(), "/02_TRIMMED/")
+path <- paste0(workdir, "/02_TRIMMED")
 
 fnFs <- sort(list.files(path, pattern = "_trimmed_1.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern = "_trimmed_2.fastq.gz", full.names = TRUE))
@@ -165,7 +166,6 @@ names(dna) <- taxa_names(physeq)
 physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
-
 
 physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim = ";", locale = locale(decimal_mark = ",")) %>% column_to_rownames("Run")
 sample_data(physeq) <- physeq_meta %>% sample_data()
