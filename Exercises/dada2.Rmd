@@ -84,7 +84,8 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
 out
 ```
 
-Next we will learn the error rates from the data and denoise the data.
+Next we will learn the error rates from the data and denoise the data.  
+We'll use a bit less data for this step to speed up the process (default is 1e8).
 
 ```{r "learnErrors", eval=FALSE}
 errF <- learnErrors(filtFs, multithread = TRUE, nbases = 1e7)
