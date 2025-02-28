@@ -32,7 +32,7 @@ And we need to set the working directory to our course folder. So change the pat
 And then run the code block below.  
 
 ```{r "libraries", eval=FALSE}
-workdir="PATH_TO_COURSE_FOLDER"
+workdir="PATH_TO_WORKDIR"
 setwd(workdir)
 
 .libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
