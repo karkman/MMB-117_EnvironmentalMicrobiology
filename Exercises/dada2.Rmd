@@ -20,7 +20,7 @@ library(tidyverse)
 ```{r}
 library(dada2)
 
-path <- "02_TRIMMED/"
+path <- "02_TRIMMED"
 
 # Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
@@ -28,7 +28,7 @@ fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
 # Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
-plotQualityProfile(fnFs[1:6])
+plotQualityProfile(fnFs[3:6])
 plotQualityProfile(fnRs[1:6])
 
 # Place filtered files in filtered/ subdirectory
