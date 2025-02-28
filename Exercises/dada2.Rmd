@@ -7,7 +7,7 @@ And then run the code block below.
 ```{r setup}
 setwd("PATH_TO_YOUR_WORKING_DIRECTORY")
 
-.libPaths(c("/projappl/project_201312/project_rpackages_r421", .libPaths()))
+.libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 
 library(dada2)
@@ -20,7 +20,6 @@ Then we will make two lists of the read files in the folder, one for R1 and one 
 And get the samples names from the names of the read files (from R1 read files to be precise.)
 
 ```{r}
-
 path <- "02_TRIMMED/"
 
 fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
@@ -81,13 +80,9 @@ saveRDS(taxa, "taxa.rds")
 
 Statistical analysis part
 
-Use R 4.2.1
-
 ```{r}
-.libPaths(c("/users/antkark/projappl/project_rpackages_r421", .libPaths()))
-libpath <- .libPaths()[1]
-
 library(phyloseq)
+
 ASV_table <- readRDS("seqtab.rds")
 TAX_table <- readRDS("taxa.rds")
 
