@@ -171,8 +171,8 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim = ";", locale = locale(decimal_mark = ",")) %>% column_to_rownames("Run")
-sample_data(physeq) <- physeq_meta %>% sample_data()
+MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t") %>% column_to_rownames("Sample")
+sample_data(physeq) <- MMB117metadata %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")
 ```

@@ -9,7 +9,7 @@ metadata <- read_delim(
 	name_repair = 'minimal'
 ) %>%
 	separate(SnowDepth, " ", into = "SnowDepth") %>%
-	select(-ResponsiblePerson)
+	select(-ResponsiblePerson) %>% mutate(Sample = str_replace(Sample, "_", "-"))
 
 write_delim(metadata, "doc/metadata.txt", delim="\t")
 ```

@@ -49,23 +49,29 @@ library(tidyverse)
 setwd("PATH/TO/COURSE/FOLDER")
 ```
 
-Read in matadata
-```{r}
-MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t")
+Read in the phyloseq object and extract the metadata from the object.  
+
+```{r "read_metadata"}
+physeq <- readRDS("physeq.rds")
+MMB117metadata <- sample_data(physeq)
 
 View(MMB117metadata)
-#MMB117metadata <- MMB117metadata[1:25, 1:20]
 ```
 
-## Read in data
+Read in data
 
 ```{r}
-ASV_table <- readRDS("seqtab.rds")
+ASV_table <- physeq %>%
+  otu_table() %>%
+  as.data.frame() %>%
+  t()
 
 str(ASV_table)
 View(ASV_table)
 
-tax_table <- readRDS("taxa.rds")
+tax_table <- physeq %>%
+  tax_table() %>%
+  as.data.frame()
 str(tax_table)
 
 View(tax_table)

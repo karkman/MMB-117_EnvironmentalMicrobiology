@@ -1,27 +1,27 @@
 Sample	Site	SnowDepth	WetWeight	DryWeight	80C_DryWeight	DNAWeight	Moisture	pH_W	pH_Ca	SOM	Notes	10_5_TSA_Plate	10_6_TSA_Plate	10_7_TSA_Plate	10_4_Malt_Plate	10_5_Malt_Plate	10_6_Malt_Plate	Other_plate_observations
-GA_01	Gas_station	10	10.02	6.51	NA	306.2	58.04	6.61	5.63	13.5	ground was tough and frozen	24	1	0	18	8	0	NA
-GA_02	Gas_station	10	10.03	6.47	NA	236.6	57.95	5.76	5.24	12	sample taken from a lawn area between a gas station & walkway, small pieces of plastic found in site, ground was frozen	103	12	3	30	6	1	NA
-GA_03	Gas_station	NA	11.21	6.84	6.79	501.1	65.11	6.18	5.72	7.6	sample was flooded	32	1	3	11	1	0	NA
-GA_04	Gas_station	NA	17.43	13.51	13.43	284.7	32.02	6.37	5.77	3.8	very gravel sample, mostly small stones	14	1	0	7	1	0	NA
-GA_05	Gas_station	0	10.039	5.566	5.436	340	84.68	6.19	5.58	17.56	ground was not covered in snow and was tough and frozen, the soil was dark brown and wet 	43	3	0	17	3	1	10-5 malt plate had fungal growth
-GA_06	Gas_station	NA	10.003	6.717	6.587	338.3	51.86	6.37	5.62	11.732	the soil is dark brown and moist and feels a bit sandy	completely covered	5	1	12	1	0	The plate, that was fully covered had mobile bacilli
-PA_01	Park	10	10	6.088	5.95	216.3	68.07	5.8	5.34	20.065	cold and frozen, tough to dig sample. lots of plant roots	47	6	0	1	0	0	NA
-PA_02	Park	10	10.09	7.612	7.5	247.5	34.53	6.37	5.57	11.03	NA	28	2	0	2	0	0	NA
-PA_03	Park	NA	10.09	7.292	7.16	250.9	40.92	6.6	5.81	12.551	lawn area, but some big roots, topsoil frozen	15	4	0	0	0	0	NA
-PA_04	Park	10	10	7.16	7.07	240.1	41.44	6.4	5.74	11.94	sample taken from a lawn area, the soil was frozen & hard	36	10	1	8	2	1	NA
-PA_05	Park	NA	10	6.86	6.78	249	47.49	6.36	5.63	12.314	frozen topsoil, some big roots under	23	1	6	10	0	0	NA
-PA_06	Park	NA	10	7.05	6.95	272.7	42.88	6.53	5.97	11.105	NA	17	14	2	8	0	0	TSA-7 has what looked like largwe fungal growth, after microscopy it turned out to be a G+ bacillus
-FI_01	Field	NA	10.55	8.17	8.03	298.7	31.38	5.57	4.44	NA	clay soil with too much water	6	0	0	2	0	0	NA
-FI_02	Field	0	10.51	8	7.48	589.4	40.5	5.5	4.58	NA	yellowish clay soil, the soil was slightly frozen, but not hard, ground was not covered with snow	2	0	0	1	0	0	NA
-FI_03	Field	NA	10.38	7.59	7.48	280.9	38.77	5.41	4.49	NA	clay soil with too much water	2	2	0	0	0	0	NA
-FI_04	Field	0	10.3	6.87	6.73	285.22	53.046	5.6	4.55	12.292	Had quite a bit of small roots in the sample	NA	NA	NA	NA	NA	NA	NA
-FI_05	Field	5	9.97	6.9	6.76	301	47.485	5.69	5.04	11.709	Had quite a bit of small roots in the sample	NA	NA	NA	NA	NA	NA	NA
-FI_06	Field	0	10.07	6.71	6.54	317.78	53.975	5.56	4.83	10.719	Easy to work with, found some glass	NA	NA	NA	NA	NA	NA	NA
-FO_01	Forest	NA	10.029	7.85	7.76	240	29.24	4.9	3.86	11.12	next to small maple tree, loose soil	1	1	1	13	2	0	NA
-FO_02	Forest	NA	10.024	7.4	7.28	293	37.69	5.01	4.14	12.21	next to a birch tree	1	1	0	11	3	0	NA
-FO_03	Forest	NA	10.08	7.41	7.32	291	37.7	4.86	3.91	11.87	soil much looser than other sites, lots of small plant roots	0	2	2	7	1	0	NA
-FO_04	Forest	15	10.284	7.47	7.36	231	39.3	4.87	4	12.36	small roots, small rocks, loose and fine, dark brown, shrubs & an aspen near collection site, 15cm of snow	NA	NA	NA	NA	NA	NA	mycellium, biofilm
-FO_05	Forest	15	10.057	7.29	7.2	277	39.7	4.9	3.79	8.54	small roots, small rocks, less loose, possibly higher moisture, lighter brown, piece of glass, 15 cm of snow	NA	NA	NA	NA	NA	NA	mycellium, biofilm
-FO_06	Forest	15	10.339	6.64	6.51	307	58.8	4.7	3.79	16.55	small roots, loose, several bugs, 15 cm of snow	NA	NA	NA	NA	NA	NA	biofilm
+GA-01	Gas_station	10	10.02	6.51	NA	306.2	58.04	6.61	5.63	13.5	ground was tough and frozen	24	1	0	18	8	0	NA
+GA-02	Gas_station	10	10.03	6.47	NA	236.6	57.95	5.76	5.24	12	sample taken from a lawn area between a gas station & walkway, small pieces of plastic found in site, ground was frozen	103	12	3	30	6	1	NA
+GA-03	Gas_station	NA	11.21	6.84	6.79	501.1	65.11	6.18	5.72	7.6	sample was flooded	32	1	3	11	1	0	NA
+GA-04	Gas_station	NA	17.43	13.51	13.43	284.7	32.02	6.37	5.77	3.8	very gravel sample, mostly small stones	14	1	0	7	1	0	NA
+GA-05	Gas_station	0	10.039	5.566	5.436	340	84.68	6.19	5.58	17.56	ground was not covered in snow and was tough and frozen, the soil was dark brown and wet 	43	3	0	17	3	1	10-5 malt plate had fungal growth
+GA-06	Gas_station	NA	10.003	6.717	6.587	338.3	51.86	6.37	5.62	11.732	the soil is dark brown and moist and feels a bit sandy	completely covered	5	1	12	1	0	The plate, that was fully covered had mobile bacilli
+PA-01	Park	10	10	6.088	5.95	216.3	68.07	5.8	5.34	20.065	cold and frozen, tough to dig sample. lots of plant roots	47	6	0	1	0	0	NA
+PA-02	Park	10	10.09	7.612	7.5	247.5	34.53	6.37	5.57	11.03	NA	28	2	0	2	0	0	NA
+PA-03	Park	NA	10.09	7.292	7.16	250.9	40.92	6.6	5.81	12.551	lawn area, but some big roots, topsoil frozen	15	4	0	0	0	0	NA
+PA-04	Park	10	10	7.16	7.07	240.1	41.44	6.4	5.74	11.94	sample taken from a lawn area, the soil was frozen & hard	36	10	1	8	2	1	NA
+PA-05	Park	NA	10	6.86	6.78	249	47.49	6.36	5.63	12.314	frozen topsoil, some big roots under	23	1	6	10	0	0	NA
+PA-06	Park	NA	10	7.05	6.95	272.7	42.88	6.53	5.97	11.105	NA	17	14	2	8	0	0	TSA-7 has what looked like largwe fungal growth, after microscopy it turned out to be a G+ bacillus
+FI-01	Field	NA	10.55	8.17	8.03	298.7	31.38	5.57	4.44	NA	clay soil with too much water	6	0	0	2	0	0	NA
+FI-02	Field	0	10.51	8	7.48	589.4	40.5	5.5	4.58	NA	yellowish clay soil, the soil was slightly frozen, but not hard, ground was not covered with snow	2	0	0	1	0	0	NA
+FI-03	Field	NA	10.38	7.59	7.48	280.9	38.77	5.41	4.49	NA	clay soil with too much water	2	2	0	0	0	0	NA
+FI-04	Field	0	10.3	6.87	6.73	285.22	53.046	5.6	4.55	12.292	Had quite a bit of small roots in the sample	NA	NA	NA	NA	NA	NA	NA
+FI-05	Field	5	9.97	6.9	6.76	301	47.485	5.69	5.04	11.709	Had quite a bit of small roots in the sample	NA	NA	NA	NA	NA	NA	NA
+FI-06	Field	0	10.07	6.71	6.54	317.78	53.975	5.56	4.83	10.719	Easy to work with, found some glass	NA	NA	NA	NA	NA	NA	NA
+FO-01	Forest	NA	10.029	7.85	7.76	240	29.24	4.9	3.86	11.12	next to small maple tree, loose soil	1	1	1	13	2	0	NA
+FO-02	Forest	NA	10.024	7.4	7.28	293	37.69	5.01	4.14	12.21	next to a birch tree	1	1	0	11	3	0	NA
+FO-03	Forest	NA	10.08	7.41	7.32	291	37.7	4.86	3.91	11.87	soil much looser than other sites, lots of small plant roots	0	2	2	7	1	0	NA
+FO-04	Forest	15	10.284	7.47	7.36	231	39.3	4.87	4	12.36	small roots, small rocks, loose and fine, dark brown, shrubs & an aspen near collection site, 15cm of snow	NA	NA	NA	NA	NA	NA	mycellium, biofilm
+FO-05	Forest	15	10.057	7.29	7.2	277	39.7	4.9	3.79	8.54	small roots, small rocks, less loose, possibly higher moisture, lighter brown, piece of glass, 15 cm of snow	NA	NA	NA	NA	NA	NA	mycellium, biofilm
+FO-06	Forest	15	10.339	6.64	6.51	307	58.8	4.7	3.79	16.55	small roots, loose, several bugs, 15 cm of snow	NA	NA	NA	NA	NA	NA	biofilm
 CTRL-TATCCAGT	Control	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
 BI-PCR	Control	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
