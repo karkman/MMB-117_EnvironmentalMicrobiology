@@ -78,8 +78,8 @@ out
 Next we will learn the error rates from the data and denoise the data.
 
 ``` r
-errF <- learnErrors(filtFs, multithread = TRUE)
-errR <- learnErrors(filtRs, multithread = TRUE)
+errF <- learnErrors(filtFs, multithread = TRUE, nbases = 1e7)
+errR <- learnErrors(filtRs, multithread = TRUE, nbases = 1e7)
 ```
 
 And plot the error profiles.
@@ -89,11 +89,18 @@ plotErrors(errF, nominalQ = TRUE)
 plotErrors(errR, nominalQ = TRUE)
 ```
 
+To speed up, we’ll first dereplicate the data.
+
+``` r
+derepF <- derepFastq(filtFs, verbose = TRUE)
+derepR <- derepFastq(filtRs, verbose = TRUE)
+```
+
 Then we can denoise the data.
 
 ``` r
-dadaFs <- dada(filtFs, err = errF, multithread = TRUE)
-dadaRs <- dada(filtRs, err = errR, multithread = TRUE)
+dadaFs <- dada(derepF, err = errF, multithread = TRUE)
+dadaRs <- dada(derepR, err = errR, multithread = TRUE)
 ```
 
 And merge the forward and reverse reads.
@@ -167,8 +174,8 @@ physeq <- merge_phyloseq(physeq, dna)
 
 taxa_names(physeq) <- paste0("ASV", seq(ntaxa(physeq)))
 
-physeq_meta <- read_delim("doc/metadata_bacteria.csv", delim = ";", locale = locale(decimal_mark = ",")) %>% column_to_rownames("Run")
-sample_data(physeq) <- physeq_meta %>% sample_data()
+MMB117metadata <- read_delim("doc/metadata.txt", delim = "\t") %>% column_to_rownames("Sample")
+sample_data(physeq) <- MMB117metadata %>% sample_data()
 
 saveRDS(physeq, "physeq.rds")
 ```

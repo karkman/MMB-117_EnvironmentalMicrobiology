@@ -87,8 +87,8 @@ out
 Next we will learn the error rates from the data and denoise the data.
 
 ```{r "learnErrors", eval=FALSE}
-errF <- learnErrors(filtFs, multithread = TRUE)
-errR <- learnErrors(filtRs, multithread = TRUE)
+errF <- learnErrors(filtFs, multithread = TRUE, nbases = 1e7)
+errR <- learnErrors(filtRs, multithread = TRUE, nbases = 1e7)
 ```
 
 And plot the error profiles.
@@ -98,11 +98,18 @@ plotErrors(errF, nominalQ = TRUE)
 plotErrors(errR, nominalQ = TRUE)
 ```
 
+To speed up, we'll first dereplicate the data.  
+
+```{r "derep", eval=FALSE}
+derepF <- derepFastq(filtFs, verbose = TRUE)
+derepR <- derepFastq(filtRs, verbose = TRUE)
+```
+
 Then we can denoise the data.
 
 ```{r "denoise", eval=FALSE}
-dadaFs <- dada(filtFs, err = errF, multithread = TRUE)
-dadaRs <- dada(filtRs, err = errR, multithread = TRUE)
+dadaFs <- dada(derepF, err = errF, multithread = TRUE)
+dadaRs <- dada(derepR, err = errR, multithread = TRUE)
 ```
 
 And merge the forward and reverse reads.
