@@ -16,13 +16,13 @@ library(microViz)
 library(tidyverse)
 ```
 
+Then we will make two lists of the read files in the folder, one for R1 and one for R2 read files.
+And get the samples names from the names of the read files (from R1 read files to be precise.)
 
 ```{r}
-library(dada2)
 
-path <- "02_TRIMMED"
+path <- "02_TRIMMED/"
 
-# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 fnFs <- sort(list.files(path, pattern="_trimmed_1.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_trimmed_2.fastq.gz", full.names = TRUE))
 # Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
@@ -106,7 +106,7 @@ sample_data(physeq) <- physeq_meta %>% sample_data()
 saveRDS(physeq, "physeq.rds")
 ```
 
-Data analysis
+Preliminary community data exploration
 
 ```{r}
 library(microViz)
