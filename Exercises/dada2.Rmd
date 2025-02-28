@@ -119,7 +119,7 @@ And merge the forward and reverse reads.
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose = TRUE)
 ```
 
-And convert it to a sequence table.
+And convert it to a sequence table and print the dimensions and the length distribution of the ASVs.
 
 ```{r "seqtab", eval=FALSE}
 seqtab <- makeSequenceTable(mergers)
@@ -136,7 +136,7 @@ dim(seqtab.nochim)
 sum(seqtab.nochim) / sum(seqtab)
 ```
 
-Last part is to track the data through the pipeline. 
+Last part is to track the data through the pipeline.  
 
 ```{r "track", eval=FALSE}
 getN <- function(x) sum(getUniques(x))
@@ -147,16 +147,26 @@ rownames(track) <- sample.names
 track
 ```
 
-If everything looks fine, we can assign taxonomy to the ASVs.
+All the ASVs are now made and we can save the sequence table as an RDS file.
+
+```{r "saveSeqtab", eval=FALSE}
+saveRDS(seqtab.nochim, "seqtab.rds")
+```
+
+
+Then we can assign taxonomy to the ASVs.
 
 ```{r "taxonomy", eval=FALSE}
-taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
+taxa <- assignTaxonomy(seqtab.nochim, "/scratch/project_2013123/DB/silva_nr99_v138.2_toSpecies_trainset.fa.gz", multithread = TRUE)
 
 taxa.print <- taxa
 rownames(taxa.print) <- NULL
 head(taxa.print)
+```
 
-saveRDS(seqtab.nochim, "seqtab.rds")
+And save the taxonomy table as an RDS file.
+
+```{r "saveTaxa", eval=FALSE}
 saveRDS(taxa, "taxa.rds")
 ```
 
