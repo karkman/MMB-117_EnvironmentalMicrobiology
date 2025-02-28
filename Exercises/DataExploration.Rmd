@@ -62,36 +62,33 @@ Read in data
 
 ```{r}
 ASV_table <- physeq %>%
-  otu_table() %>%
-  as.data.frame() %>%
-  t()
+    otu_table() %>%
+    as.data.frame()
 
 str(ASV_table)
 View(ASV_table)
 
 tax_table <- physeq %>%
-  tax_table() %>%
-  as.data.frame()
-str(tax_table)
+    tax_table() %>%
+    as.data.frame()
 
+str(tax_table)
 View(tax_table)
 
 identical(rownames(tax_table), colnames(ASV_table))
-# [1] TRUE
 
-head(rownames(tax_table))
+tax_table %>%
+    rownames() %>%
+    head()
 
-head(colnames(ASV_table))
-
-colnames(ASV_table) <- paste0("ASV", seq(ncol(ASV_table)))
-
-rownames(tax_table) <- paste0("ASV", seq(nrow(tax_table)))
+ASV_table %>%
+    colnames() %>%
+    head()
 
 # I will store the row sums for later use if I need:
 ASV_counts_per_sampleDF <- as.data.frame(rowSums(ASV_table))
 
 # I will check if there are ASVs that are detected only less than 3 times
-
 dim(ASV_table)
 # [1]    26 20262
 
@@ -110,59 +107,31 @@ class(ASV_table)
 ## TSS normalization to get realtive abundances for data exploration
 
 ```{r}
-ASV_tableRA.mat<- apply(ASV_table, 1, function(i) i/sum(i))
-ASV_tableRA.mat<-t(ASV_tableRA.mat)
+ASV_tableRA.mat <- apply(ASV_table, 1, function(i) i / sum(i))
+ASV_tableRA.mat <- t(ASV_tableRA.mat)
 
 View(ASV_tableRA.mat)
 
 # I will remove the negative control from BI
 
-ASV_tableRA.mat<-ASV_tableRA.mat[2:nrow(ASV_tableRA.mat),]
+ASV_tableRA.mat <- ASV_tableRA.mat[2:nrow(ASV_tableRA.mat), ]
 View(MMB117metadata)
-
-# # the Sample names are different...
-# # I will change them.
-
-# MMB117metadata$Sample
-# #[1] GA_01        GA_02        GA_03        GA_04        GA_05        GA_06        PA_01        PA_02        PA_03        PA_04        PA_05        PA_06       
-# #[13] FI_01        FI_02        FI_03        FI_04        FI_05        FI_06        FO_01        FO_02        FO_03        FO_04        FO_05        FO_06       
-# #[25] Neg. control
-
-# rownames(ASV_tableRA.mat)
-# #[1] "CTRL-TATCCAGT" "FI-01"         "FI-02"         "FI-03"         "FI-04"         "FI-05"         "FI-06"         "FO-01"         "FO-02"         "FO-03"        
-# #[11] "FO-04"         "FO-05"         "FO-06"         "GA-01"         "GA-02"         "GA-03"         "GA-04"         "GA-05"         "GA-06"         "PA-01"        
-# #[21] "PA-02"         "PA-03"         "PA-04"         "PA-05"         "PA-06"        
-
-# MMB117Samples<- c("Neg. control", "FI_01", "FI_02", "FI_03",  "FI_04",  "FI_05",  "FI_06",  
-#                   "FO_01" , "FO_02", "FO_03", "FO_04",  "FO_05" , "FO_06",
-#                   "GA_01",  "GA_02" ,  "GA_03",  "GA_04",  "GA_05", "GA_06",
-#                   "PA_01",  "PA_02" , "PA_03" ,"PA_04"  ,"PA_05",   "PA_06")
-# length(MMB117Samples)
-# #[1] 25
-
-# rownames(ASV_tableRA.mat)<-MMB117Samples
 
 # a basic NMDS plot usually tells if there is something funny with the data
 
-plot(metaMDS(ASV_tableRA.mat), type="text", display="sites")
+plot(metaMDS(ASV_tableRA.mat), type = "text", display = "sites")
 
-#Warning message:
-#In metaMDS(ASV_tableRA.mat) :
- # stress is (nearly) zero: you may have insufficient data
-
-# because of the negative control, as the plot shows.
-
-plot(metaMDS(ASV_tableRA.mat[2:25,]), type="text", display="sites")
+plot(metaMDS(ASV_tableRA.mat[2:25, ]), type = "text", display = "sites")
 
 # looks pretty good!
 
 # For the future I want to put the samples in the same order in the metadata and ASV data.
 
-ASV_tableRA.mat_o<-ASV_tableRA.mat[match(MMB117metadata$Sample,row.names(ASV_tableRA.mat)),]
+ASV_tableRA.mat_o <- ASV_tableRA.mat[match(MMB117metadata$Sample, row.names(ASV_tableRA.mat)), ]
 
 # Now I can also get Shannons diversity index and put that into metadata
 
-MMB117metadata$ASV_divSha<-diversity(ASV_tableRA.mat_o)
+MMB117metadata$ASV_divSha <- diversity(ASV_tableRA.mat_o)
 ```
 
 
@@ -196,49 +165,48 @@ str(MMB117metadata)
 So lets plot all variables that make sense to look at 
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample, SnowDepth, label=Site)) +
- geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Snow depth")
+ggplot(MMB117metadata, aes(Sample, SnowDepth, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Snow depth")
 ```
 
 Not recorded for all, maybe can be left out from the analysis
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample,  WetWeight, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Wet weight (g)")
+ggplot(MMB117metadata, aes(Sample, WetWeight, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Wet weight (g)")
 
-ggplot(MMB117metadata, aes(Sample,  DryWeight, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Dry weight (air dried) (g)")
+ggplot(MMB117metadata, aes(Sample, DryWeight, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Dry weight (air dried) (g)")
 
-ggplot(MMB117metadata, aes(Sample,  X80C_DryWeight, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Owen dry weight, pore water dried out (g)")
-
+ggplot(MMB117metadata, aes(Sample, X80C_DryWeight, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Owen dry weight, pore water dried out (g)")
 ```
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample,  DNAWeight, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-ggtitle("What was weighed for DNA extraction (mg)")
+ggplot(MMB117metadata, aes(Sample, DNAWeight, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("What was weighed for DNA extraction (mg)")
 
 
-ggplot(MMB117metadata, aes(Sample,  Moisture, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Soil water % (?)")
+ggplot(MMB117metadata, aes(Sample, Moisture, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Soil water % (?)")
 ```
 
 
@@ -247,17 +215,17 @@ There are some that are very wet.
 Interesting to see if their microbiome is completely different because of the snow for instance
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample,  pH_W, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Water-extraxted pH")
+ggplot(MMB117metadata, aes(Sample, pH_W, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Water-extraxted pH")
 
-ggplot(MMB117metadata, aes(Sample,  pH_Ca, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("CaCl2-extraxted pH")
+ggplot(MMB117metadata, aes(Sample, pH_Ca, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("CaCl2-extraxted pH")
 ```
 
 Nice grouping!!
@@ -265,30 +233,30 @@ Nice grouping!!
 With both pH's actually
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample,  SOM, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Soil organic matter (LOI)")
+ggplot(MMB117metadata, aes(Sample, SOM, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Soil organic matter (LOI)")
 ```
 
 Few samples that are under or above but not too extreme I would say
 Some missing data as well
 
 ```{r}
-ggplot(MMB117metadata, aes(Sample,  ASV_divSha, label=Site)) +
-  geom_point(color="black", size=3)+
-  theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust=0, vjust=0.5))+
-  geom_text_repel(color="black",size=4,max.overlaps = Inf )+
-  ggtitle("Shannon's diversity index, Y data")
+ggplot(MMB117metadata, aes(Sample, ASV_divSha, label = Site)) +
+    geom_point(color = "black", size = 3) +
+    theme(axis.text.x = element_text(colour = "black", size = 8, angle = 270, hjust = 0, vjust = 0.5)) +
+    geom_text_repel(color = "black", size = 4, max.overlaps = Inf) +
+    ggtitle("Shannon's diversity index, Y data")
 
 # negative control is an outlier, as it should
 
 # The NMDS plot also shows if there are otliers in the samples (in terms of Y data)
-plot(metaMDS(ASV_tableRA.mat[2:25,]), type="text", display="sites")
+plot(metaMDS(ASV_tableRA.mat[2:25, ]), type = "text", display = "sites")
 # and not really
 
-plot(metaMDS(ASV_tableRA.mat[2:25,]))
+plot(metaMDS(ASV_tableRA.mat[2:25, ]))
 ```
 
 This shows both the species and sites and from this we cans see that different species associate to different sites
@@ -303,38 +271,38 @@ But the variability of the observations should be similar. i.e. the size of the 
 So lets check this with metadata and Shannons diversity index
 
 ```{r}
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  Moisture)) + 
-  geom_boxplot() +
-  theme_bw(base_size = 14)+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, Moisture)) +
+    geom_boxplot() +
+    theme_bw(base_size = 14) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(legend.position = "none")
 ```
 
 whoops! Good thing we are not studying change of soil water % in response to land use!
 But I wouldn't build a linear model using soil water % as an explaining variable. non-parametric statistical test would be probably ok.
 
 ```{r}
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  pH_W)) + 
-  geom_boxplot() +
-  theme_bw(base_size = 14)+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, pH_W)) +
+    geom_boxplot() +
+    theme_bw(base_size = 14) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(legend.position = "none")
 
 # same here but less extreme
 
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  pH_Ca)) + 
-  geom_boxplot() +
-  theme_bw(base_size = 14)+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, pH_Ca)) +
+    geom_boxplot() +
+    theme_bw(base_size = 14) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(legend.position = "none")
 
 # this could work with liner model as an X-variable
 
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  SOM)) + 
-  geom_boxplot() +
-  theme_bw(base_size = 14)+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, SOM)) +
+    geom_boxplot() +
+    theme_bw(base_size = 14) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(legend.position = "none")
 ```
 
 Some samples dont have SOM -values
@@ -342,11 +310,11 @@ Some samples dont have SOM -values
 Gas station is "in another planet", so SOM as an X-variable of a linear model would probably be a bad idea.
 
 ```{r}
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(Site,  ASV_divSha)) + 
-  geom_boxplot() +
-  theme_bw(base_size = 14)+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, ASV_divSha)) +
+    geom_boxplot() +
+    theme_bw(base_size = 14) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(legend.position = "none")
 ```
 
 Also diversity shows heterogeneity in the variances, but this probably would work in linear models as an Y-variable
@@ -425,15 +393,15 @@ or even change the sign of estimated parameters.
 collinearity can be detected with pairwise scatter plots comparing covariates,
 
 ```{r}
-plot(MMB117metadata[,c(8:11)])
+plot(MMB117metadata[, c(8:11)])
 
 # pH water and pH CaCl2 seem to correlate, as they should. But because of the collinearity issue both of them cannot be used in a model
 
-# relationships: Y-values should be plotted against X-values to see which X-values should be included in the model. 
+# relationships: Y-values should be plotted against X-values to see which X-values should be included in the model.
 
-plot(MMB117metadata[,c(8:11,21)])
+plot(MMB117metadata[, c(8:11, 21)])
 
-# This was a lazy persons solution. We can see that these is a relationship with the diversity and the X-variables. 
+# This was a lazy persons solution. We can see that these is a relationship with the diversity and the X-variables.
 # And this also makes bilogically sense.
 
 # So if we would do linear models and use diversity as the response variable, we might need to consider
@@ -452,34 +420,36 @@ I will categorize water-content
 ```{r}
 summary(MMB117metadata$Moisture)
 
-Water_FirstQ<-38.50
-Water_Median<-42.16 
-Water_ThirdQ<- 54.97
+Water_FirstQ <- 38.50
+Water_Median <- 42.16
+Water_ThirdQ <- 54.97
 
-MMB117metadata$MoistureCAT<- cut(MMB117metadata$Moisture,c(0, 45,  84.68  ))
+MMB117metadata$MoistureCAT <- cut(MMB117metadata$Moisture, c(0, 45, 84.68))
 
-MMB117metadata$MoistureCAT  
+MMB117metadata$MoistureCAT
 
-levels(MMB117metadata$MoistureCAT )  
-#[1] "(0,45]"    "(45,84.7]"
+levels(MMB117metadata$MoistureCAT)
+# [1] "(0,45]"    "(45,84.7]"
 
-levels(MMB117metadata$MoistureCAT )  <- c("0 - 45 %","45 - 84.7 %")
+levels(MMB117metadata$MoistureCAT) <- c("0 - 45 %", "45 - 84.7 %")
 
 MMB117metadata$MoistureCAT
 
 
-ggplot(subset(MMB117metadata, Sample!="Neg. control"), aes(x=pH_Ca, y=ASV_divSha, colour=Site)) +
-  geom_boxplot(outlier.shape = NA) +
-  geom_jitter() +
-  scale_color_manual(values=c("springgreen4", "chocolate4","purple4","royalblue"))+
-  facet_grid(Site ~ MoistureCAT) +
-  theme_bw(base_size = 14)+
-  theme(strip.background = element_rect(colour = "black", fill = "white"))+
-  theme(panel.border = element_rect(colour = "black"))+
-  theme(axis.title.x=element_blank(),
-        axis.title.y=element_blank())+
-  #guides(color=guide_legend(title="Sample type"))+
-  theme(legend.position="none")
+ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(x = pH_Ca, y = ASV_divSha, colour = Site)) +
+    geom_boxplot(outlier.shape = NA) +
+    geom_jitter() +
+    scale_color_manual(values = c("springgreen4", "chocolate4", "purple4", "royalblue")) +
+    facet_grid(Site ~ MoistureCAT) +
+    theme_bw(base_size = 14) +
+    theme(strip.background = element_rect(colour = "black", fill = "white")) +
+    theme(panel.border = element_rect(colour = "black")) +
+    theme(
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+    ) +
+    # guides(color=guide_legend(title="Sample type"))+
+    theme(legend.position = "none")
 
 # Looks like in our case we don't have enough observations for this interaction
 ```
