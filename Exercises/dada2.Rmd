@@ -105,7 +105,7 @@ derepF <- derepFastq(filtFs, verbose = TRUE)
 derepR <- derepFastq(filtRs, verbose = TRUE)
 ```
 
-Then we can denoise the data.
+Then we can denoise the data. This will take some time.  
 
 ```{r "denoise", eval=FALSE}
 dadaFs <- dada(derepF, err = errF, multithread = TRUE)
