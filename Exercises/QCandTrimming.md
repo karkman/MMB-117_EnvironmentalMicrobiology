@@ -66,6 +66,8 @@ Before going to the primer removal step, we'll go thru the multiQC reports toget
 ## Primer removal
 
 Since the amplification will create artificial sequences at the primer sites (all identical to the primers), we need to remove those before running any further analyses. You will need the primer sequences for this step. Also check the `cutadapt` manual for the other options were using.  
+If you have problems copy-pasting the command, you can also create a file called `cutadapt.sh` with nano (`nano cutadapt.sh`) and modify the script there.  
+When the script is ready, save the file and run cutadapt for all files with `bash cutadapt.sh`.  
 
 ```bash
 module load cutadapt/4.9
