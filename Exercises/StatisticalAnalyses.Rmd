@@ -20,3 +20,232 @@ Lorem ipsum
 ```{r "libraries"}
 library(tidyverse)
 ```
+
+```{r "all_chunk", eval=FALSE}
+# Outcomes of the data exploration:
+# No reason to remove any values (outliers)
+# Heteroscedasticity in all variables except pH_Ca and Shannon diversity index this is within acceptable levels
+# Normality: If we use relative abundances, they are not normally distributed. Shannon's diversity index would be
+# Fixed X: we don't have this problem
+# Collinearity in X and  Relationships Y & X: We need to select only one pH and looks like there are relationships
+# between Y-data and all X-values. So perhaps we should model the influence of pH_Ca, SOM and GWC on communities.
+# Interactions: we don't have enough observations for a model with interactions.
+# About GWC: we can include it in the analysis for practice. But actually there is an issue and it is the
+# amount of snow. We didn't have a system for removing the snow or taking the amount of snow into account.
+# So GWC might not be that interesting although it could explain a lot "numerically".
+#################################################################################
+# Biostatistical analyses:
+# One of the original research questions was to see how the diversity & community structure
+# is influenced by human activities (different sites)
+# hypothesis was that the diversity would be lower in the gas station
+# Based on data exploration, we also should ask what is the influence of pH_Ca, SOM and GWC on communities.
+# We can answer these questions with ordination analyses
+# We can model pH_Ca and diversity as linear vectors
+# and SOM % and GWC % as nonlinear surfaces (GAM)
+# test that NMDS works and check the dimensions
+plot(metaMDS(ASV_tableRA.mat_o[1:24,]), type="text", display="sites")
+#Save the NMDS
+MMB117_NMDS<-metaMDS(ASV_tableRA.mat_o[1:24,])
+# add colors to metadata
+levels(MMB117metadata$Site)
+MMB117metadata$color<-rep(1, nrow(MMB117metadata))
+MMB117metadata<- within(MMB117metadata, color[Site=="Field"]<-"greenyellow")
+MMB117metadata<- within(MMB117metadata, color[Site=="Forest"]<-"forestgreen")
+MMB117metadata<- within(MMB117metadata, color[Site=="Gas_station"]<-"darkslategray4")
+MMB117metadata<- within(MMB117metadata, color[Site=="Park"]<-"darkkhaki")
+# I want to get rid of the negative control
+MMB117metadata_noneg<-subset(MMB117metadata,Sample!="Neg. control")
+MMB117metadata_noneg<-droplevels(MMB117metadata_noneg)
+# environmental fitting of the NMDS with diversity and pH
+MMB117EF<-envfit(MMB117_NMDS ~ ASV_divSha + pH_Ca,MMB117metadata_noneg, permutations=999)
+MMB117EF
+#***VECTORS
+#           NMDS1    NMDS2     r2 Pr(>r)
+#ASV_divSha -0.98618 -0.16566 0.8160  0.001 ***
+ # pH_Ca      -0.96879  0.24788 0.9187  0.001 ***
+#  ---
+#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Permutation: free
+# Number of permutations: 999
+# This means that pH_Ca (alone) explains 91 % of the variance
+# and that diversity (alone) explains 82 % of the variance
+# including pH_Ca and div as linear vectors and surface fitting SOM %
+NMDSoplot<-ordiplot(MMB117_NMDS,type="n", xlim=c(-1.8,1.8),
+                  ylim=c(-1.8,1.8),cex.axis = 1.5, cex.lab = 1.5)
+with(MMB117metadata_noneg, points(MMB117_NMDS$points,pch=15, cex=2, col=MMB117metadata_noneg$color))
+plot(MMB117EF, col="cyan4", cex=1)
+with(MMB117metadata_noneg, ordisurf(MMB117_NMDS,SOM, add = TRUE, col = "grey20", cex=2))
+#with(MMB117metadata_noneg, ordisurf(MMB117_NMDS,Moisture, add = TRUE, col = "royalblue"))
+identify(NMDSoplot, "sites", labels = MMB117metadata_noneg$Sample, cex=1)
+with(MMB117metadata_noneg, legend(1.2,1.8, legend= levels(Site), cex=1.5, bty= "n",
+       col=c("greenyellow", "forestgreen", "darkslategray4","darkkhaki"), pch=c(15,15,15,15)))
+legend(1.25,0.98,"SOM %",cex=1.5,lty=1,col="grey20",bty= "n")
+# Identify samples by clicking them. I would click only those that are "outliers", to get the idea how
+# SOM influences on communities
+# hit "esc" when you are ready. Check that your cursor is in the terminal if nothing happens.
+# statistical interpretation:
+NMDS_SOM_surf <- ordisurf(MMB117_NMDS ~ SOM, MMB117metadata_noneg)
+summary(NMDS_SOM_surf)
+#Family: gaussian
+#Link function: identity
+#Formula:
+# y ~ s(x1, x2, k = 10, bs = "tp", fx = FALSE)
+#Parametric coefficients:
+#             Estimate  Std. Error t value Pr(>|t|)
+#(Intercept)  12.0270     0.3347   35.93 2.89e-14 ***
+# ---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#Approximate significance of smooth terms:
+#  edf Ref.df     F  p-value
+#s(x1,x2) 7.164      9 8.282 0.000152 ***
+#  ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#R-sq.(adj) =  0.788   Deviance explained = 86.4%
+#-REML = 49.569  Scale est. = 2.3531    n = 21
+# ordisurf fits a GAM model and accepts nonlinear variables
+# We have an intercept model and the estimate is a mean of our response variable (SOM %)
+# R-sq.(adj) =  0.788 suggests that ~79 % of the variance is explained by SOM % (pretty good!)
+# Deviance explained = 86.4% indicates the goodness of fit, which is also very good in our case.
+# So what the model suggests is that SOM % explains ~79 % of the variance
+# in the community structure (=beta diversity) (p < 0.05 )
+# Interestingly, the diversity is growing to the direction of the gas station!
+# Why?
+# It is lowest in the forest and field sites
+# Why??
+6:41
+# same plot with GWC
+# including pH_Ca and div as linear vectors and surface fitting GWC %
+NMDSoplot<-ordiplot(MMB117_NMDS,type="n", xlim=c(-1.8,1.8),
+                    ylim=c(-1.8,1.8),cex.axis = 1.5, cex.lab = 1.5)
+with(MMB117metadata_noneg, points(MMB117_NMDS$points,pch=15, cex=2, col=MMB117metadata_noneg$color))
+plot(MMB117EF, col="cyan4", cex=1)
+#with(MMB117metadata_noneg, ordisurf(MMB117_NMDS,SOM, add = TRUE, col = "grey20", cex=2))
+with(MMB117metadata_noneg, ordisurf(MMB117_NMDS,Moisture, add = TRUE, col = "royalblue", cex=2))
+identify(NMDSoplot, "sites", labels = MMB117metadata_noneg$Sample, cex=1)
+with(MMB117metadata_noneg, legend(1.2,1.8, legend= levels(Site), cex=1.5, bty= "n",
+                                  col=c("greenyellow", "forestgreen", "darkslategray4","darkkhaki"), pch=c(15,15,15,15)))
+legend(1.25,0.98,"GWC %",cex=1.5,lty=1,col="royalblue",bty= "n")
+# Identify samples by clicking them. I would click only those that are "outliers", to get the idea how
+# GWC influences on communities
+# hit "esc" when you are ready. Check that your cursor is in the terminal if nothing happens.
+# do the statistical interpretation for GWC yourself:
+# We can also model influence of the variables on metadata with Permanova:
+adonis2(ASV_tableRA.mat_o[1:24,] ~ Site + pH_Ca + SOM + Moisture, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Permutation test for adonis under reduced model
+#Terms added sequentially (first to last)
+#Permutation: free
+#Number of permutations: 9999
+#adonis2(formula = ASV_tableRA.mat_o[1:24, ] ~ Site + pH_Ca + SOM + Moisture, data = MMB117metadata_noneg, permutations = 9999, by = "terms", na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#Site      3   3.7750 0.57535 8.0953 0.0001 ***
+#pH_Ca     1   0.1677 0.02556 1.0789 0.3460
+#SOM       1   0.2339 0.03565 1.5049 0.1425
+#Moisture  1   0.2084 0.03176 1.3406 0.1932
+#Residual 14   2.1762 0.33167
+#Total    20   6.5612 1.00000
+#---
+#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Permanova suggests that only Site is significant.
+# Lets see what happens if we leave the site away.
+adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca + SOM + Moisture, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Permutation test for adonis under reduced model
+#Terms added sequentially (first to last)
+#Permutation: free
+#Number of permutations: 9999
+#adonis2(formula = ASV_tableRA.mat_o[1:24, ] ~ pH_Ca + SOM + Moisture, data = MMB117metadata_noneg, permutations = 9999, by = "terms", na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#pH_Ca     1   2.0646 0.31467 9.8115 0.0001 ***
+#SOM       1   0.3296 0.05024 1.5664 0.1213
+#Moisture  1   0.5896 0.08986 2.8018 0.0089 **
+#Residual 17   3.5773 0.54523
+#Total    20   6.5612 1.00000
+#---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# now SOM is not significant! Let's see what happens if we leave away GWC (moisture).
+adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca + SOM, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Permutation test for adonis under reduced model
+#Terms added sequentially (first to last)
+#Permutation: free
+#Number of permutations: 9999
+#adonis2(formula = ASV_tableRA.mat_o[1:24, ] ~ pH_Ca + SOM, data = MMB117metadata_noneg, permutations = 9999, by = "terms", na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#pH_Ca     1   2.0646 0.31467 8.9187 0.0001 ***
+#SOM       1   0.3296 0.05024 1.4239 0.1606
+#Residual 18   4.1669 0.63509
+#Total    20   6.5612 1.00000
+#---
+ # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# so according to permanova SOM is not significant.
+# what happens if we leave out pH?
+adonis2(ASV_tableRA.mat_o[1:24,] ~  SOM, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Permutation test for adonis under reduced model
+#Terms added sequentially (first to last)
+#Permutation: free
+#Number of permutations: 9999
+#adonis2(formula = ASV_tableRA.mat_o[1:24, ] ~ SOM, data = MMB117metadata_noneg, permutations = 9999, by = "terms", na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#SOM       1   0.2959 0.04511 0.8975  0.504
+#Residual 19   6.2652 0.95489
+#Total    20   6.5612 1.00000
+# Same result.
+# What if we include pH and GWC?
+adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca + Moisture, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#pH_Ca     1   2.0743 0.27493 8.5617 0.0001 ***
+#Moisture  1   0.3828 0.05074 1.5800 0.1127
+#Residual 21   5.0880 0.67434
+#Total    23   7.5451 1.00000
+#---
+ # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# so maybe we should include only site in our permanova, or then pH without the site.
+# why is this and we needed to check how the results change?
+adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca , data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#           Df SumOfSqs      R2      F Pr(>F)
+#pH_Ca     1   2.0743 0.27493 8.3417  1e-04 ***
+#Residual 22   5.4708 0.72507
+#Total    23   7.5451 1.00000
+#---
+ # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+adonis2(ASV_tableRA.mat_o[1:24,] ~ Site, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+#Df SumOfSqs      R2      F Pr(>F)
+#Site      3   4.2844 0.56784 8.7597  1e-04 ***
+#Residual 20   3.2607 0.43216
+#Total    23   7.5451 1.00000
+#---
+ # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# which one we should have, Site or pH?
+# If we have time, we could discuss "what Johanna and/or Antti would do in real life", i.e. if this would be an actual study.
+#####################
+# Influence of the site on alpha diversity:
+# We can compare the diversities of the sites with for instance a t-test (remember the normality):
+library(ggpubr)
+ggplot(MMB117metadata_noneg, aes(x=Site, y=ASV_divSha)) +
+  geom_point(aes(fill=factor(Site)), size=3, shape=21, colour="grey20",alpha=0.7,
+             position=position_jitter(width=0.01, height=0.01)) +
+  geom_boxplot (outlier.colour = NA, fill=NA, colour="grey20") +
+  theme_bw(base_size = 14)+
+  theme(strip.background = element_rect(colour = "black", fill = "white"))+
+  theme(axis.text.x = element_text(angle = 35,hjust=0.7,vjust=0.8))+
+  theme(panel.border = element_rect(colour = "black"))+
+  #theme(axis.text.x=element_blank())+
+  scale_fill_manual(values=c("greenyellow", "forestgreen", "darkslategray4","darkkhaki"))+
+  theme(axis.title.x=element_blank(),
+        axis.title.y=element_blank())+
+  theme(legend.position="none")+
+  geom_hline(yintercept = mean(na.omit(MMB117metadata_noneg$ASV_divSha)), linetype = 2)+
+  stat_compare_means(label = "p.signif", method = "t.test",
+                     ref.group = "Forest", hide.ns = TRUE)
+# so significantly higher in Gas station and park than in Forest.
+# What does "significantly" mean?
+# we can also get the comparison in a table format like this:
+compare_means(ASV_divSha ~ Site,  data = MMB117metadata_noneg,
+              ref.group = "Forest", method = "t.test")
+# A tibble: 3 × 8
+#.y.        group1 group2              p    p.adj p.format p.signif method
+#<chr>      <chr>  <chr>           <dbl>    <dbl> <chr>    <chr>    <chr>
+#1 ASV_divSha Forest Field       0.0755    0.076    0.07552  ns       T-test
+#2 ASV_divSha Forest Gas_station 0.0000273 0.000082 2.7e-05  ****     T-test
+#3 ASV_divSha Forest Park        0.000154  0.00031  0.00015  ***      T-test
+#########################################
+# So what you will write in your reports?
+```

@@ -107,10 +107,12 @@ ASV_tableRA.mat <- t(ASV_tableRA.mat)
 View(ASV_tableRA.mat)
 ```
 
-We can also remove the BI negative control.
+We can also remove the BI negative control. And we should remove it from
+the metadata as well.
 
 ``` r
 ASV_tableRA.mat <- ASV_tableRA.mat[2:nrow(ASV_tableRA.mat), ]
+MMB117metadata <- MMB117metadata[-1, ]
 ```
 
 # Ordination
