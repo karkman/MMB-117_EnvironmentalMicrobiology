@@ -82,7 +82,7 @@ for sample in $(cat sample_names.txt); do
         01_RAW/*${sample}*_R2_001.fastq.gz \
         -o 02_TRIMMED/${sample}_trimmed_1.fastq.gz \
         -p 02_TRIMMED/${sample}_trimmed_2.fastq.gz \
-        > 02_TRIMMED/${sample}.log
+        > 00_LOGS/${sample}.log
 done
 
 module purge
