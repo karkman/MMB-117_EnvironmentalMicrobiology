@@ -19,11 +19,10 @@ output:
 
 ```{r "libraries"}
 library(tidyverse)
-# library(reshape2)
-# library(dplyr)
-# library(tidyr)
-# library(MASS)
-# library(vegan)
+library(phyloseq)
+library(vegan)
+library(ggrepel)
+
 # library(ggplot2)
 # library(ggthemes)
 # library(colorspace)
@@ -37,7 +36,6 @@ library(tidyverse)
 # # library(multcomp)
 # library(scales)
 # library(viridis)
-# library(ggrepel)
 # library(pheatmap)
 # # library(psych)
 ```
