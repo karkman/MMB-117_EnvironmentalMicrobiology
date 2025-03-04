@@ -158,7 +158,7 @@ We had only one sampling point. Thus we don't really have "traditional" independ
 If we would have taken samples before and after some treatment from the same sites, we would have to take this into account in our statistical analyses
 (use mixed models, etc.)
 
-### Outliers in X & Y-
+### Outliers in X & Y
 
 X = metadata and things that are usually on x-axis
 
