@@ -10,22 +10,6 @@ library(tidyverse)
 library(phyloseq)
 library(vegan)
 library(ggrepel)
-
-# library(ggplot2)
-# library(ggthemes)
-# library(colorspace)
-# library(colorRamps)
-# library(RColorBrewer)
-# library(gridExtra)
-# library(fitdistrplus)
-# library(logspline)
-# library(car)
-# library(lme4)
-# # library(multcomp)
-# library(scales)
-# library(viridis)
-# library(pheatmap)
-# # library(psych)
 ```
 
 ## Setup
@@ -532,7 +516,7 @@ ggplot(subset(MMB117metadata, Site != "Control"), aes(x = pH_Ca, y = ASV_divSha,
 Looks like in our case we don’t have enough observations for this
 interaction
 
-\## OPTIONAL: Possible contamination from control samples
+## OPTIONAL: Possible contamination from control samples
 
 We can have a closer look at the possible contaminants in our negative
 control. We first identify all ASV that are present in our negative
