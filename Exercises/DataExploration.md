@@ -330,7 +330,7 @@ ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, Moisture)) +
 
 whoops! Good thing we are not studying change of soil water % in
 response to land use! But I wouldn’t build a linear model using soil
-water % as an explaining variable. non-parametric statistical test would
+water % as an explaining variable. Non-parametric statistical test would
 be probably ok.
 
 ``` r
@@ -380,7 +380,7 @@ do not require homogeneity.
 If we would really need to use linear models, we could also transform
 these variables or delete observations that are outliers and go with for
 instance 3 observations per site.  
-This is the reason why even 6 observations (6 samples) per site can bee
+This is the reason why even 6 observations (6 samples) per site can be
 too little!
 
 ### Normality
@@ -388,7 +388,7 @@ too little!
 Often people say that the data should be normally distributed, if you
 want to apply linear models.  
 This is not exactly true: The normality should be met at each X value.
-This is of difficult to check if the data does not have multiple
+This is often difficult to check if the data does not have multiple
 observations for each X and we don’t. In other words, the Y-data
 contains the effects of all the explanatory variables (all metadata).
 Therefore it is misleading to assess normality according the Y data.
@@ -458,7 +458,7 @@ collinearity can be detected with pairwise scatter plots comparing
 covariates,
 
 ``` r
-plot(MMB117metadata[, c(8:11)])
+plot(MMB117metadata[, c(3:10)])
 ```
 
 pH water and pH CaCl2 seem to correlate, as they should. But because of
@@ -467,7 +467,7 @@ relationships: Y-values should be plotted against X-values to see which
 X-values should be included in the model.
 
 ``` r
-plot(MMB117metadata[, c(8:11, 21)])
+plot(MMB117metadata[, c(3:10, 20)])
 ```
 
 This was a lazy persons solution. We can see that these is a
@@ -484,28 +484,41 @@ might have an interaction and this can be taken into account.
 Let’s try to visualize if we have something like this.  
 I will categorize water-content
 
+First summarize the moisture.
+
 ``` r
 summary(MMB117metadata$Moisture)
+```
 
+Then we can categorize the moisture content and add them to the
+metadata.
+
+``` r
 Water_FirstQ <- 38.50
 Water_Median <- 42.16
 Water_ThirdQ <- 54.97
 
 MMB117metadata$MoistureCAT <- cut(MMB117metadata$Moisture, c(0, 45, 84.68))
+```
 
+Then we can check what we have.
+
+``` r
 MMB117metadata$MoistureCAT
-
 levels(MMB117metadata$MoistureCAT)
+```
 
+And change the levels to something more informative.
+
+``` r
 levels(MMB117metadata$MoistureCAT) <- c("0 - 45 %", "45 - 84.7 %")
-
 MMB117metadata$MoistureCAT
 ```
 
 And then plot the pH and diversity
 
 ``` r
-ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(x = pH_Ca, y = ASV_divSha, colour = Site)) +
+ggplot(subset(MMB117metadata, Site != "Control"), aes(x = pH_Ca, y = ASV_divSha, colour = Site)) +
     geom_boxplot(outlier.shape = NA) +
     geom_jitter() +
     scale_color_manual(values = c("springgreen4", "chocolate4", "purple4", "royalblue")) +
@@ -513,11 +526,6 @@ ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(x = pH_Ca, y = ASV_
     theme_bw(base_size = 14) +
     theme(strip.background = element_rect(colour = "black", fill = "white")) +
     theme(panel.border = element_rect(colour = "black")) +
-    theme(
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank()
-    ) +
-    # guides(color=guide_legend(title="Sample type"))+
     theme(legend.position = "none")
 ```
 

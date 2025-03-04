@@ -329,7 +329,7 @@ ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, Moisture)) +
 ```
 
 whoops! Good thing we are not studying change of soil water % in response to land use!
-But I wouldn't build a linear model using soil water % as an explaining variable. non-parametric statistical test would be probably ok.
+But I wouldn't build a linear model using soil water % as an explaining variable. Non-parametric statistical test would be probably ok.
 
 ```{r "boxplots_2", eval=FALSE}
 ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, pH_W)) +
@@ -374,12 +374,12 @@ ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(Site, ASV_divSha)) 
 Also diversity shows heterogeneity in the variances, but this probably would work in linear models as an Y-variable.  
 We can take these into account by selecting statistical models that that do not require homogeneity.  
 If we would really need to use linear models, we could also transform these variables or delete observations that are outliers and go with for instance 3 observations per site.  
-This is the reason why even 6 observations (6 samples) per site can bee too little!
+This is the reason why even 6 observations (6 samples) per site can be too little!
 
 ### Normality
 
 Often people say that the data should be normally distributed, if you want to apply linear models.  
-This is not exactly true: The normality should be met at each X value.  This is of difficult to check if the data does not have multiple observations for each X and we don't. 
+This is not exactly true: The normality should be met at each X value. This is often difficult to check if the data does not have multiple observations for each X and we don't. 
 In other words, the Y-data contains the effects of all the explanatory variables (all metadata).
 Therefore it is misleading to assess normality according the Y data. Better choice is to apply a model and plot the pooled residuals. Since the linear models should be LINEAR, the residuals should have the same distance to fitted values (predicted means). If they do not, 
 then the model is not linear and the plot of residuals against fitted values will show a curve or some other pattern. This means that the RESIDUALS should be normally distributed, if linear models are used.
@@ -423,14 +423,14 @@ or even change the sign of estimated parameters.
 collinearity can be detected with pairwise scatter plots comparing covariates,
 
 ```{r "collinearity", eval=FALSE}
-plot(MMB117metadata[, c(8:11)])
+plot(MMB117metadata[, c(3:10)])
 ```
 
 pH water and pH CaCl2 seem to correlate, as they should. But because of the collinearity issue both of them cannot be used in a model.  
 relationships: Y-values should be plotted against X-values to see which X-values should be included in the model.
 
 ```{r "relationships", eval=FALSE}
-plot(MMB117metadata[, c(8:11, 21)])
+plot(MMB117metadata[, c(3:10, 20)])
 ```
 
 This was a lazy persons solution. We can see that these is a relationship with the diversity and the X-variables.  
@@ -445,28 +445,39 @@ This means that if we would do linear models, some of the X-variables might have
 Let's try to visualize if we have something like this.  
 I will categorize water-content
 
+First summarize the moisture.  
 ```{r "interactions", eval=FALSE}
 summary(MMB117metadata$Moisture)
+```
 
+Then we can categorize the moisture content and add them to the metadata.  
+
+```{r "categorize", eval=FALSE}
 Water_FirstQ <- 38.50
 Water_Median <- 42.16
 Water_ThirdQ <- 54.97
 
 MMB117metadata$MoistureCAT <- cut(MMB117metadata$Moisture, c(0, 45, 84.68))
+```
 
+Then we can check what we have. 
+
+```{r "levels", eval=FALSE}
 MMB117metadata$MoistureCAT
-
 levels(MMB117metadata$MoistureCAT)
+```
 
+ And change the levels to something more informative.  
+
+```{r "relevel", eval=FALSE}
 levels(MMB117metadata$MoistureCAT) <- c("0 - 45 %", "45 - 84.7 %")
-
 MMB117metadata$MoistureCAT
 ```
 
 And then plot the pH and diversity
 
 ```{r "interactions_plot", eval=FALSE}
-ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(x = pH_Ca, y = ASV_divSha, colour = Site)) +
+ggplot(subset(MMB117metadata, Site != "Control"), aes(x = pH_Ca, y = ASV_divSha, colour = Site)) +
     geom_boxplot(outlier.shape = NA) +
     geom_jitter() +
     scale_color_manual(values = c("springgreen4", "chocolate4", "purple4", "royalblue")) +
@@ -474,11 +485,6 @@ ggplot(subset(MMB117metadata, Sample != "Neg. control"), aes(x = pH_Ca, y = ASV_
     theme_bw(base_size = 14) +
     theme(strip.background = element_rect(colour = "black", fill = "white")) +
     theme(panel.border = element_rect(colour = "black")) +
-    theme(
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank()
-    ) +
-    # guides(color=guide_legend(title="Sample type"))+
     theme(legend.position = "none")
 ```
 
