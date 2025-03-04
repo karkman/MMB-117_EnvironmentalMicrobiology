@@ -489,3 +489,46 @@ ggplot(subset(MMB117metadata, Site != "Control"), aes(x = pH_Ca, y = ASV_divSha,
 ```
 
 Looks like in our case we don't have enough observations for this interaction
+
+ ## OPTIONAL: Possible contamination from control samples
+
+We can have a closer look at the possible contaminants in our negative control.
+We first identify all ASV that are present in our negative control.  
+Then we can check if these are present in our samples.
+
+Extract only control samples.  
+
+```{r "neg_control", eval=FALSE}
+ctrl_physeq <- physeq %>% subset_samples(Site=="Control")
+```
+
+Filter out ASVs that are present in the control (nmore than 1).
+
+```{r "neg_control_filter", eval=FALSE}
+ctrl_taxa <- prune_taxa(taxa_sums(ctrl_physeq)>0, ctrl_physeq)
+```
+
+Get names of ASVs that are present in the control.
+
+```{r "neg_control_names", eval=FALSE}
+ctrl_taxa_names <- ctrl_taxa %>% taxa_names()
+```
+
+Extract only those taxa from the whole dataset.
+
+```{r "neg_control_extract", eval=FALSE}
+ctrl_ASV_table <- prune_taxa(taxa_names(physeq) %in% ctrl_taxa_names,  physeq)
+```
+
+Plot a heatmap of the ASVs that are present in the control.
+
+```{r "neg_control_heatmap", eval=FALSE}
+library(pheatmap)
+pheatmap(otu_table(ctrl_ASV_table), cluster_rows = FALSE)
+```
+
+Square-root transformation of the data maybe looks better. 
+
+```{r "neg_control_heatmap_sqrt", eval=FALSE}
+pheatmap(sqrt(otu_table(ctrl_ASV_table)), cluster_rows = FALSE)
+```
