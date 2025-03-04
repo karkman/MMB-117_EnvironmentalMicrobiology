@@ -51,7 +51,11 @@ Read in the phyloseq object and extract the metadata from the object.
 
 ```{r "read_metadata", eval=FALSE}
 physeq <- readRDS("physeq.rds")
-MMB117metadata <- sample_data(physeq) %>% rownames_to_column("Sample")
+
+MMB117metadata <- sample_data(physeq) %>%
+    as_tibble() %>%
+    mutate(Sample = rownames(sample_data(physeq))) %>%
+    as.data.frame()
 
 View(MMB117metadata)
 ```
@@ -93,9 +97,11 @@ identical(rownames(tax_table), colnames(ASV_table))
 ```
 
 Store the row sums (total ASV count) for later use and check the number of ASVs that are detected only less than 3 times.
+We can also make a barplot of the ASV counts per sample.
 
 ```{r "ASV_counts", eval=FALSE}
-ASV_counts_per_sampleDF <- as.data.frame(rowSums(ASV_table))
+ASV_counts_per_sampleDF <- data.frame(LibSize=rowSums(ASV_table))
+barplot(ASV_counts_per_sampleDF$LibSize, names=rownames(ASV_counts_per_sampleDF), main="ASV counts per sample", ylab="ASV count", las=2)
 
 dim(ASV_table)
 
@@ -117,17 +123,25 @@ ASV_tableRA.mat <- t(ASV_tableRA.mat)
 View(ASV_tableRA.mat)
 ```
 
-We can also remove the BI negative control. And we should remove it from the metadata as well.  
+Relative abundances should add up to 1. We can check this.  
+Two different ways to do this that should give the same result.
+
+```{r "RA_check", eval=FALSE}
+apply(ASV_tableRA.mat, 1, sum)
+
+rowSums(ASV_tableRA.mat)
+```
+
+We can remove the BI negative control as there is no data. And we should remove it from the metadata as well.  
 
 ```{r "remove_neg_control", eval=FALSE}
 ASV_tableRA.mat <- ASV_tableRA.mat[2:nrow(ASV_tableRA.mat), ]
 MMB117metadata <- MMB117metadata[-1, ]
 ```
 
-
 # Ordination
 
-Ordination with all samples and without the negative control.  
+Ordination with all samples and without our own negative control.  
 
 ```{r "ordination", eval=FALSE}
 plot(metaMDS(ASV_tableRA.mat), type = "text", display = "sites")
