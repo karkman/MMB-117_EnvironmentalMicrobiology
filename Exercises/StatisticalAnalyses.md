@@ -14,26 +14,9 @@ visualise and test all possible combinations (that make sense).
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 library(tidyverse)
-```
-
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.4     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library(phyloseq)
 library(vegan)
 ```
-
-    ## Loading required package: permute
-    ## Loading required package: lattice
 
 First we need to read in the data and make the the objects for plotting.
 

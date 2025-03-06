@@ -19,7 +19,7 @@ During this excercise session we try to visualise our data and also test our res
 We will use the `phyloseq` package to visualise the data and `vegan` package to test the hypothesis.  
 Below you find some examples, but you need to modify the code to visualise and test all possible combinations (that make sense). 
 
-```{r "libraries"}
+```{r "libraries", eval=FALSE}
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 library(tidyverse)
