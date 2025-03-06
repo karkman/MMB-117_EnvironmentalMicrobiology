@@ -1,37 +1,45 @@
----
-title: MMB-117
-output: 
-        github_document:
-        toc: true
-        toc_float: true
-        number_sections: true
-        fig_caption: true
-        keep_md: true
-        highlight: tango
-        theme: united
-        dev: svg
-        self_contained: no
----
+MMB-117
+================
 
 # Statistical analyses
 
-During this excercise session we try to visualise our data and also test our research questions.  
-We will use the `phyloseq` package to visualise the data and `vegan` package to test the hypothesis.  
-Below you find some examples, but you need to modify the code to visualise and test all possible combinations (that make sense). 
+During this excercise session we try to visualise our data and also test
+our research questions.  
+We will use the `phyloseq` package to visualise the data and `vegan`
+package to test the hypothesis.  
+Below you find some examples, but you need to modify the code to
+visualise and test all possible combinations (that make sense).
 
-```{r "libraries"}
+``` r
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.0.4     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(phyloseq)
 library(vegan)
 ```
 
-First we need to read in the data and make the the objects for plotting.  
+    ## Loading required package: permute
+    ## Loading required package: lattice
 
-Read in the phyloseq object and extract the metadata from the object.  
+First we need to read in the data and make the the objects for plotting.
 
-```{r "read_metadata", eval=FALSE}
+Read in the phyloseq object and extract the metadata from the object.
+
+``` r
 physeq <- readRDS("physeq.rds")
 physeq <- subset_samples(physeq, Site != "Control")
 
@@ -45,98 +53,122 @@ MMB117metadata$ASV_divSha <- diversity(otu_table(physeq), index = "shannon")
 View(MMB117metadata)
 ```
 
+We can also use phylseq to normalise or transform our data.
 
-We can also use phylseq to normalise or transform our data. 
+Relative abundances.
 
-Relative abundances.  
-
-```{r "normalise", eval=FALSE}
+``` r
 physeq_ra <- transform_sample_counts(physeq, function(x) x / sum(x))
 ```
 
-For CLR transformation we can use `decostand` function from vegan package.  
-We need to extract the ASV table from the phyloseq object and then make a new objet and store the transformed count to that object.  
-But you can find many other packages that can do this.  
+For CLR transformation we can use `decostand` function from vegan
+package.  
+We need to extract the ASV table from the phyloseq object and then make
+a new objet and store the transformed count to that object.  
+But you can find many other packages that can do this.
 
-```{r "clr", eval=FALSE}
+``` r
 ASV_table <- physeq %>% otu_table()
 ASV_table <- decostand(ASV_table, "clr", 1, pseudocount=1)
 physeq_clr <- physeq
 otu_table(physeq_clr) <- otu_table(ASV_table, taxa_are_rows=FALSE)
 ```
 
-Rarefaction of the data. We can use the `rarefy_even_depth` function from phyloseq package.
+Rarefaction of the data. We can use the `rarefy_even_depth` function
+from phyloseq package.
 
-```{r "rarefaction", eval=FALSE}
+``` r
 physeq_rare <- rarefy_even_depth(physeq, sample.size=min(sample_sums(physeq)), rngseed=1)
 ```
 
 Extract the differntly normalised data for further analyses.  
-Raw counts as an example.  
+Raw counts as an example.
 
-```{r "extract_tables", eval=FALSE}
+``` r
 ASV_table <- physeq %>%
     otu_table() %>%
     as.data.frame()
 ```
 
-Outcomes of the data exploration:
-- No reason to remove any values (outliers)
-- Heteroscedasticity in all variables except pH_Ca and Shannon diversity index this is within acceptable levels
-- Normality: If we use relative abundances, they are not normally distributed. Shannon's diversity index would be
-- Fixed X: we don't have this problem
-- Collinearity in X and  Relationships Y & X: We need to select only one pH and looks like there are relationships between Y-data and all X-values. So perhaps we should model the influence of pH_Ca, SOM and GWC on communities.
-- Interactions: we don't have enough observations for a model with interactions.
-- About GWC: we can include it in the analysis for practice. But actually there is an issue and it is the amount of snow. We didn't have a system for removing the snow or taking the amount of snow into account. So GWC might not be that interesting although it could explain a lot "numerically".
+Outcomes of the data exploration: - No reason to remove any values
+(outliers) - Heteroscedasticity in all variables except pH_Ca and
+Shannon diversity index this is within acceptable levels - Normality: If
+we use relative abundances, they are not normally distributed. Shannon’s
+diversity index would be - Fixed X: we don’t have this problem -
+Collinearity in X and Relationships Y & X: We need to select only one pH
+and looks like there are relationships between Y-data and all X-values.
+So perhaps we should model the influence of pH_Ca, SOM and GWC on
+communities. - Interactions: we don’t have enough observations for a
+model with interactions. - About GWC: we can include it in the analysis
+for practice. But actually there is an issue and it is the amount of
+snow. We didn’t have a system for removing the snow or taking the amount
+of snow into account. So GWC might not be that interesting although it
+could explain a lot “numerically”.
 
-Biostatistical analyses:
-One of the original research questions was to see how the diversity & community structure is influenced by human activities (different sites) hypothesis was that the diversity would be lower in the gas station.  
-Based on data exploration, we also should ask what is the influence of pH_Ca, SOM and GWC on communities. We can answer these questions with ordination analyses.  
-We can model pH_Ca and diversity as linear vectors and SOM % and GWC % as nonlinear surfaces (GAM) test that NMDS works and check the dimensions.  
+Biostatistical analyses: One of the original research questions was to
+see how the diversity & community structure is influenced by human
+activities (different sites) hypothesis was that the diversity would be
+lower in the gas station.  
+Based on data exploration, we also should ask what is the influence of
+pH_Ca, SOM and GWC on communities. We can answer these questions with
+ordination analyses.  
+We can model pH_Ca and diversity as linear vectors and SOM % and GWC %
+as nonlinear surfaces (GAM) test that NMDS works and check the
+dimensions.
 
-Now we have rarefied data, so we could count the species richness. THere's a function `specnumber` in vegan package that can be used for this.  
-Below you have an example how to use it. How would you add the species richness to the metadata?  
+Now we have rarefied data, so we could count the species richness.
+THere’s a function `specnumber` in vegan package that can be used for
+this.  
+Below you have an example how to use it. How would you add the species
+richness to the metadata?
 
-```{r "species_richness", eval=FALSE}
+``` r
 specnumber(otu_table(physeq_rare))
 ```
 
-We can make a barplot of the most abundant ASVs in our data using functions from `microViz` package.  
-Read the [microViz documentation](https://david-barnett.github.io/microViz/) to see how to do this.  
+We can make a barplot of the most abundant ASVs in our data using
+functions from `microViz` package.  
+Read the [microViz
+documentation](https://david-barnett.github.io/microViz/) to see how to
+do this.
 
-```{r "barplot", eval=FALSE}
+``` r
 library(microViz)
 
 # barplot code here
-
 ```
 
+Then we can make a PCoA plot of the data. We can use the `ordinate` and
+`plot_ordination` functions from phyloseq package.  
+Make different plots for different normalisations/transformations. And
+change the method and distance accordingly.  
+The plot functions uses ggplot2 package, so you can modify the plot as
+you like.
 
-Then we can make a PCoA plot of the data. We can use the `ordinate` and `plot_ordination` functions from phyloseq package.  
-Make different plots for different normalisations/transformations. And change the method and distance accordingly.    
-The plot functions uses ggplot2 package, so you can modify the plot as you like.  
+Example with raw counts.
 
-Example with raw counts.  
-
-```{r "pcoa", eval=FALSE}
+``` r
 pcoa <- ordinate(physeq, method="PCoA", distance="bray")
 plot_ordination(physeq, pcoa, color="Site")
 ```
 
 Then we can make a bit more sophisticated NMDS plots.  
-First we need to make the NMDS with `metaMDS` function from vegan package.  
+First we need to make the NMDS with `metaMDS` function from vegan
+package.
 
-```{r "plot_nmds", eval=FALSE}
+``` r
 plot(metaMDS(ASV_table, distance="bray", k=2), type="text", display="sites")
 ```
 
 Save the NMDS
-```{r "save_nmds", eval=FALSE}
+
+``` r
 MMB117_NMDS<-metaMDS(ASV_table, distance="bray", k=2)
 ```
+
 Add colors to metadata
 
-```{r "add_colors", eval=FALSE}
+``` r
 levels(MMB117metadata$Site)
 MMB117metadata$color<-rep(1, nrow(MMB117metadata))
 MMB117metadata<- within(MMB117metadata, color[Site=="Field"]<-"greenyellow")
@@ -147,14 +179,14 @@ MMB117metadata<- within(MMB117metadata, color[Site=="Park"]<-"darkkhaki")
 
 Environmental fitting of the NMDS with diversity and pH
 
-```{r "envfit", eval=FALSE}
+``` r
 MMB117EF<-envfit(MMB117_NMDS ~ ASV_divSha + pH_Ca, MMB117metadata, permutations=999)
 MMB117EF
 ```
 
 Plot the NMDS with diversity and pH
 
-```{r "plot_nmds_div", eval=FALSE}
+``` r
 NMDSoplot<-ordiplot(MMB117_NMDS,type="n", xlim=c(-1.8,1.8),
                   ylim=c(-1.8,1.8),cex.axis = 1.5, cex.lab = 1.5)
 with(MMB117metadata, points(MMB117_NMDS$points,pch=15, cex=2, col=MMB117metadata$color))
@@ -167,32 +199,32 @@ with(MMB117metadata, legend(1.2,1.8, legend= levels(Site), cex=1.5, bty= "n",
 legend(1.25,0.98,"SOM %",cex=1.5,lty=1,col="grey20",bty= "n")
 ```
 
-Identify samples by clicking them. I would click only those that are "outliers", to get the idea how
-SOM influences on communities
-Hit "esc" when you are ready. Check that your cursor is in the terminal if nothing happens.
+Identify samples by clicking them. I would click only those that are
+“outliers”, to get the idea how SOM influences on communities Hit “esc”
+when you are ready. Check that your cursor is in the terminal if nothing
+happens.
 
 Statistical interpretation:
 
-```{r "stat_interpretation", eval=FALSE}
+``` r
 NMDS_SOM_surf <- ordisurf(MMB117_NMDS ~ SOM, MMB117metadata)
 summary(NMDS_SOM_surf)
 ```
 
-ordisurf fits a GAM model and accepts nonlinear variables
-We have an intercept model and the estimate is a mean of our response variable (SOM %)
-R-sq.(adj) =  0.788 suggests that ~79 % of the variance is explained by SOM % (pretty good!)
-Deviance explained = 86.4% indicates the goodness of fit, which is also very good in our case.
-So what the model suggests is that SOM % explains ~79 % of the variance
-in the community structure (=beta diversity) (p < 0.05 )
-Interestingly, the diversity is growing to the direction of the gas station!
-Why?
-It is lowest in the forest and field sites
-Why??
-6:41
+ordisurf fits a GAM model and accepts nonlinear variables We have an
+intercept model and the estimate is a mean of our response variable (SOM
+%) R-sq.(adj) = 0.788 suggests that ~79 % of the variance is explained
+by SOM % (pretty good!) Deviance explained = 86.4% indicates the
+goodness of fit, which is also very good in our case. So what the model
+suggests is that SOM % explains ~79 % of the variance in the community
+structure (=beta diversity) (p \< 0.05 ) Interestingly, the diversity is
+growing to the direction of the gas station! Why? It is lowest in the
+forest and field sites Why?? 6:41
 
-Same plot with GWC including pH_Ca and div as linear vectors and surface fitting GWC %
+Same plot with GWC including pH_Ca and div as linear vectors and surface
+fitting GWC %
 
-```{r "plot_nmds_gwc", eval=FALSE}
+``` r
 NMDSoplot<-ordiplot(MMB117_NMDS,type="n", xlim=c(-1.8,1.8),
                     ylim=c(-1.8,1.8),cex.axis = 1.5, cex.lab = 1.5)
 with(MMB117metadata, points(MMB117_NMDS$points,pch=15, cex=2, col=MMB117metadata$color))
@@ -205,49 +237,56 @@ with(MMB117metadata, legend(1.2,1.8, legend= levels(Site), cex=1.5, bty= "n",
 legend(1.25,0.98,"GWC %",cex=1.5,lty=1,col="royalblue",bty= "n")
 ```
 
-Identify samples by clicking them. I would click only those that are "outliers", to get the idea how GWC influences on communities.  
-Hit "esc" when you are ready. Check that your cursor is in the terminal if nothing happens. 
+Identify samples by clicking them. I would click only those that are
+“outliers”, to get the idea how GWC influences on communities.  
+Hit “esc” when you are ready. Check that your cursor is in the terminal
+if nothing happens.
 
 Do the statistical interpretation for GWC yourself.
 
 We can also model influence of the variables on metadata with Permanova:
 
-```{r "permanova", eval=FALSE}
+``` r
 adonis2(ASV_table ~ Site + pH_Ca + SOM + Moisture, data=MMB117metadata, permutations=9999, by = "terms", na.action = na.omit)
 
 adonis2(ASV_table ~ pH_Ca + SOM + Moisture, data=MMB117metadata, permutations=9999, by = "terms", na.action = na.omit)
 ```
 
-Now SOM is not significant! Let's see what happens if we leave away GWC (moisture).
+Now SOM is not significant! Let’s see what happens if we leave away GWC
+(moisture).
 
-```{r "permanova_no_gwc", eval=FALSE}
+``` r
 adonis2(ASV_table ~ pH_Ca + SOM, data=MMB117metadata, permutations=9999, by = "terms", na.action = na.omit)
 ```
+
 So according to permanova SOM is not significant.  
 What happens if we leave out pH?
 
-```{r "permanova_no_pH", eval=FALSE}
+``` r
 adonis2(ASV_tableRA.mat_o[1:24,] ~  SOM, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
 
 What if we include pH and GWC?
+```
 
-```{r "permanova_pH_GWC", eval=FALSE}
+``` r
 adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca + Moisture, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
 
 So maybe we should include only site in our permanova, or then pH without the site.  
 Why is this and we needed to check how the results change?
+```
 
-```{r "permanova_site", eval=FALSE}
+``` r
 adonis2(ASV_tableRA.mat_o[1:24,] ~ pH_Ca , data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
 adonis2(ASV_tableRA.mat_o[1:24,] ~ Site, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
 ```
 
-Which one we should have, Site or pH?  
+Which one we should have, Site or pH?
 
 Influence of the site on alpha diversity:  
-We can compare the diversities of the sites with for instance a t-test (remember the normality):
+We can compare the diversities of the sites with for instance a t-test
+(remember the normality):
 
-```{r "alpha_div", eval=FALSE}
+``` r
 library(ggpubr)
 ggplot(MMB117metadata, aes(x=Site, y=ASV_divSha)) +
   geom_point(aes(fill=factor(Site)), size=3, shape=21, colour="grey20",alpha=0.7,
@@ -268,12 +307,12 @@ ggplot(MMB117metadata, aes(x=Site, y=ASV_divSha)) +
 ```
 
 So significantly higher in Gas station and park than in Forest.  
-What does "significantly" mean?
-We can also get the comparison in a table format like this:
+What does “significantly” mean? We can also get the comparison in a
+table format like this:
 
-```{r "alpha_div_table", eval=FALSE}
+``` r
 compare_means(ASV_divSha ~ Site,  data = MMB117metadata,
               ref.group = "Forest", method = "t.test")
 ```
 
-__So what you will write in your reports?__
+**So what you will write in your reports?**
