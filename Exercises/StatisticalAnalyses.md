@@ -13,7 +13,7 @@ visualise and test all possible combinations (that make sense).
 ## Setup
 
 ``` r
-.libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
+.libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 library(tidyverse)
 library(phyloseq)

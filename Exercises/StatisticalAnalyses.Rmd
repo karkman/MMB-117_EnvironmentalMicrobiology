@@ -22,7 +22,7 @@ Below you find some examples, but you need to modify the code to visualise and t
 ## Setup 
 
 ```{r "libraries", eval=FALSE}
-.libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
+.libPaths(c("/projappl/project_2013123/project_rpackages_r421", .libPaths()))
 libpath <- .libPaths()[1]
 library(tidyverse)
 library(phyloseq)
