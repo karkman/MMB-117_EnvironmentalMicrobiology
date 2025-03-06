@@ -5,10 +5,12 @@ MMB-117
 
 During this excercise session we try to visualise our data and also test
 our research questions.  
-We will use the `phyloseq` package to visualise the data and `vegan`
-package to test the hypothesis.  
+We will use the `phyloseq` and `microViz` packages to visualise the data
+and `vegan` package to test the hypothesis.  
 Below you find some examples, but you need to modify the code to
 visualise and test all possible combinations (that make sense).
+
+## Setup
 
 ``` r
 .libPaths(c("/projappl/project_2007145/project_rpackages_r421", .libPaths()))
@@ -20,7 +22,8 @@ library(vegan)
 
 First we need to read in the data and make the the objects for plotting.
 
-Read in the phyloseq object and extract the metadata from the object.
+Read in the phyloseq object and extract the metadata from the object.  
+Also add the Shannon diversity index to the metadata.
 
 ``` r
 physeq <- readRDS("physeq.rds")
@@ -36,7 +39,10 @@ MMB117metadata$ASV_divSha <- diversity(otu_table(physeq), index = "shannon")
 View(MMB117metadata)
 ```
 
-We can also use phylseq to normalise or transform our data.
+## Transformations/normalisations
+
+We can use phyloseq to normalise and rarefy the data. And use a fucntion
+from vegan to do the CLR transformation.
 
 Relative abundances.
 
@@ -44,8 +50,7 @@ Relative abundances.
 physeq_ra <- transform_sample_counts(physeq, function(x) x / sum(x))
 ```
 
-For CLR transformation we can use `decostand` function from vegan
-package.  
+For CLR transformation we use `decostand` function from vegan package.  
 We need to extract the ASV table from the phyloseq object and then make
 a new objet and store the transformed count to that object.  
 But you can find many other packages that can do this.
