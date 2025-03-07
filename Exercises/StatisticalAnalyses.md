@@ -251,13 +251,13 @@ So according to permanova SOM is not significant.
 What happens if we leave out pH?
 
 ``` r
-adonis2(ASV_table ~  SOM, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+adonis2(ASV_table ~  SOM, data=MMB117metadata, permutations=9999, by = "terms",na.action = na.omit)
 ```
 
 What if we include pH and GWC?
 
 ``` r
-adonis2(ASV_table ~ pH_Ca + Moisture, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+adonis2(ASV_table ~ pH_Ca + Moisture, data=MMB117metadata, permutations=9999, by = "terms",na.action = na.omit)
 ```
 
 So maybe we should include only site in our permanova, or then pH
@@ -265,8 +265,8 @@ without the site.
 Why is this and we needed to check how the results change?
 
 ``` r
-adonis2(ASV_table ~ pH_Ca , data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
-adonis2(ASV_table ~ Site, data=MMB117metadata_noneg, permutations=9999, by = "terms",na.action = na.omit)
+adonis2(ASV_table ~ pH_Ca , data=MMB117metadata, permutations=9999, by = "terms",na.action = na.omit)
+adonis2(ASV_table ~ Site, data=MMB117metadata, permutations=9999, by = "terms",na.action = na.omit)
 ```
 
 Which one we should have, Site or pH?
